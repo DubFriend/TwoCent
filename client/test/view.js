@@ -128,6 +128,30 @@
         deepEqual($("#main_form span.error").html(), undefined, "message removed.");
     });
 
+    test("set_waiting", function () {
+        view.set_waiting();
+        ok($('#main_form').hasClass("faded"), "faded class added");
+        ok($('#main_form .spinner').html(), "spinner inserted");
+        deepEqual(
+            $('#main_form input[type="submit"]').attr("disabled"),
+            "disabled",
+            "form submit button disabled"
+        );
+    });
+
+    //depends on test "set_waiting"
+    test("clear_waiting", function () {
+        view.set_waiting();
+        view.clear_waiting();
+        ok(! $('#main_form').hasClass("faded"), "faded class removed");
+        ok(! $('#main_form .spinner').html(), "spinner removed");
+        deepEqual(
+            $('#main_form input[type="submit"]').attr("disabled"),
+            undefined,
+            "form submit button enabled"
+        );
+    });
+
 }());
 
 (function () {
