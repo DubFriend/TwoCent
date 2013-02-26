@@ -1,0 +1,5 @@
+var controller = (function () {
+    return {
+
+    };
+}());
