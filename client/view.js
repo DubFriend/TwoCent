@@ -104,6 +104,16 @@ var new_comments_view = function (spec) {
         $("#twocent " + this.id()).append($(build_comments(data)));
     };
 
+    that.add_comment = function(commentData, parentId) {
+        var $comment = $(build_comments([commentData]));
+        if(parentId) {
+            $('#twocent ' + this.id() + ' #twocent_' + parentId).append($comment);
+        }
+        else {
+            $('#twocent ' + this.id()).prepend($comment);
+        }
+    };
+
     return that;
 };
 

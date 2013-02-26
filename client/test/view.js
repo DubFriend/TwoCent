@@ -1,5 +1,21 @@
 (function () {
-    var view;
+    var view,
+        get_comments = function (){
+            return {
+                "id": "1",
+                "name": "bob",
+                "comment": "bobcomment",
+                "date": "date1",
+                "children": [
+                    {
+                        "id": "2",
+                        "name": "alice",
+                        "comment": "alicecomment",
+                        "date": "date2"
+                    }
+                ]
+            };
+        };
 
     module(
         "comment view",
@@ -22,7 +38,7 @@
     );
 
     test("add_comments", function () {
-        var comment = {
+        /*var comment = {
             "id": "1",
             "name": "bob",
             "comment": "bobcomment",
@@ -35,7 +51,8 @@
                     "date": "date2"
                 }
             ]
-        };
+        };*/
+        var comment = get_comments();
 
         view.update([comment]);
 
@@ -59,6 +76,35 @@
             },
             comment
         );
+    });
+
+    //depends on test "add_comments"
+    test("insert a comment nested", function () {
+        var singleComment = {
+            "id": "3",
+            "name": "will",
+            "comment": "willcomment",
+            "date": "date3"
+        };
+
+        view.update([get_comments()]);
+
+        view.add_comment(singleComment, 2);
+        singleComment['id'] = "twocent_3";
+        
+        deepEqual(
+            {
+                "id": $('#twocent_2 #twocent_3').attr("id"),
+                "name": $("#twocent_2 #twocent_3 > .name").html(),
+                "comment": $("#twocent_2 #twocent_3 > .comment").html(),
+                "date": $("#twocent_2 #twocent_3 > .date").html()
+            },
+            singleComment
+        );
+    });
+
+    test("insert a comment no parent", function () {
+        ok(true);
     });
 
 }());
