@@ -59,9 +59,18 @@ var new_view = function (spec) {
             $("#twocent " + id + ' input[type="submit"]').removeAttr("disabled");
             $("#twocent " + id).removeClass("faded");
             $("#twocent " + id).spin(false);
+        },
+
+        add_success: function (message) {
+            $("#twocent " + id).append($('<p class="success">' + message + '</p>')); 
+        },
+
+        clear_success: function () {
+            $("#twocent " + id + " p.success").remove();
         }
     };
 };
+
 
 var new_comments_view = function (spec) {
     spec['id'] = spec['id'] || "#comments";
@@ -126,7 +135,6 @@ var new_form_view = function (spec) {
         $('#twocent ' + id + ' span.error').remove();
         $('#twocent ' + id + ' .error').removeClass("error");
     };
-
 
     return that;
 }

@@ -152,6 +152,27 @@
         );
     });
 
+    test("add_success", function () {
+        view.add_success("test");
+        deepEqual(
+            $("#main_form .success").html(),
+            "test",
+            "success message added"
+        );
+    });
+
+    //depends on test "add_success"
+    test("clear_success", function () {
+        view.add_success("test");
+        view.add_success("test2")
+        view.clear_success("test");
+        deepEqual(
+            $("#main_form .success").html(),
+            undefined,
+            "success messages removed"
+        );
+    });
+
 }());
 
 (function () {
