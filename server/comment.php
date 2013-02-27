@@ -178,9 +178,9 @@ class View {
 					<div id='tc_response_form_template'>" . $this->build_response_form() . "</div>
 				</div>
 			</div>
-			" . $this->build_main_comment_form('main_form') . "
-			<div id='comments'>" . $this->build_all_comments($comments) . "</div>
-			<div id='loading_comments'></div>
+			" . $this->build_main_comment_form('tc_main_form') . "
+			<div id='tc_comments'>" . $this->build_all_comments($comments) . "</div>
+			<div id='tc_loading_comments'></div>
 		</div>";
 	}
 	
@@ -197,16 +197,17 @@ class View {
 				<script src='http://www.google.com/recaptcha/api/js/recaptcha_ajax.js'></script>
 				<script src='client/spin.js'></script>
 				<script src='client/lib.js'></script>
-				<script src='client/execute.js'></script>
+				<script src='client/model.js'></script>
+				<script src='client/view.js'></script>
+				<script src='client/controller.js'></script>
+				<script src='client/twocent.js'></script>
 			</body>
 		</html>";
 	}
 
 	private function build_response_form() {
 		return "
-		<form id='response_form'>
-			<input type='hidden' name='parent'/>
-			<input type='hidden' name='pageId'/>
+		<form id='tc_response_form'>
 			<input type='text' name='name' placeholder='Your Name Here.'/>
 			<textarea name='comment' placeholder='Enter a cool comment :)'></textarea>
 			<div id='recaptcha'></div>
@@ -253,7 +254,7 @@ class View {
 		}
 
 		$html = "
-		<div class='comment_wrap' id='$id'>
+		<div class='comment_wrap' id='tc_$id'>
 			<div class='name'>$name</div>
 			<div class='comment'>$comment</div>
 			<div class='date'>$date</div>

@@ -29,7 +29,11 @@
                     '<button class="response_button" type="button">Response</button>' +
                 '</div>';
 
-                $('#qunit-fixture').append('<div id="twocent"><div id="tc_comments"></div></div>');
+                $('#qunit-fixture').append(
+                    '<div id="twocent">' +
+                        '<div id="tc_comments"></div>' +
+                        '<div id="tc_loading_comments"></div>' +
+                    '</div>');
                 view = new_comments_view({
                     template: template
                 });
@@ -40,7 +44,7 @@
     test("add_comments", function () {
         var comment = get_comments();
 
-        view.update([comment]);
+        view.update({comments:[comment]});
 
         comment['id'] = 'tc_1';
         comment['children'][0]['id'] = 'tc_2';
@@ -73,9 +77,15 @@
             "date": "date3"
         };
 
-        view.update([get_comments()]);
+        view.update({comments:[get_comments()]});
 
-        view.add_comment(singleComment, 2);
+        view.update({
+            insertComment: {
+                data: singleComment,
+                parentId: 2
+            }
+        });
+
         singleComment['id'] = "tc_3";
         
         deepEqual(
@@ -98,9 +108,12 @@
             "date": "date3"
         };
 
-        view.update([get_comments()]);
+        view.update({comments:[get_comments()]});
 
-        view.add_comment(singleComment);
+        view.update({
+            insertComment: {data: singleComment}
+        });
+
         singleComment['id'] = "tc_3";
         
         deepEqual(
@@ -112,6 +125,16 @@
             },
             singleComment
         );
+    });
+
+    test("waiting status", function () {
+        view.update({isWaiting:true});
+        ok($('#tc_loading_comments').hasClass('faded'), "faded class added");
+        ok($('#tc_loading_comments .spinner').html(), "spinner added");
+
+        view.update({isWaiting:false});
+        ok($('#tc_loading_comments').hasClass('faded'), "faded class removed");
+        ok($('#tc_loading_comments .spinner').html(), "spinner removed");
     });
 
 }());
@@ -158,7 +181,8 @@
     test("clear", function () {
         $('#tc_main_form input[name="name"]').val(" bob ");
         $('#tc_main_form [name="comment"]').html(" bob comment ");
-        view.clear();
+        //view.clear();
+        view.update({clear:true});
         deepEqual(
             {
                 "name": $('#tc_main_form input[name="name"]').val(),
@@ -172,21 +196,56 @@
     });
 
     test("add_error", function () {
-        view.add_error("name", "message");
+        //view.add_error("name", "message");
+        view.update({
+            error: {
+                inputName: "name",
+                message: "message"
+            }
+        });
         ok($('#tc_main_form input[name="name"]').hasClass("error"), "error class added to input");
         deepEqual($("#tc_main_form span.error").html(), "message", "message added.");
     });
 
+    test("add array of errors", function () {
+        view.update({
+            error: [
+                {
+                    inputName: "name",
+                    message: "message"
+                },
+                {
+                    inputName: "comment",
+                    message: "another"
+                }
+            ]
+        });
+        ok($('#tc_main_form input[name="name"]').hasClass("error"), "error class added to name input");
+        ok($('#tc_main_form [name="comment"]').hasClass("error"), "error class added to comment input");
+        deepEqual($("#tc_main_form span.error").first().html(), "message", "first message added.");
+        deepEqual($("#tc_main_form span.error").last().html(), "another", "second message added.");
+    });
+
     //depends on test "add_error"
     test("clear_error", function () {
-        view.add_error("name", "message");
-        view.clear_error();
+        view.update({
+            error: {
+                inputName: "name",
+                message: "message"
+            }
+        });
+
+        view.update({
+            error: false
+        });
+        
         ok(! $('#tc_main_form input[name="name"]').hasClass("error"), "error class removed from input");
         deepEqual($("#tc_main_form span.error").html(), undefined, "message removed.");
     });
 
     test("set_waiting", function () {
-        view.set_waiting();
+        view.update({isWaiting: true});
+
         ok($('#tc_main_form').hasClass("faded"), "faded class added");
         ok($('#tc_main_form .spinner').html(), "spinner inserted");
         deepEqual(
@@ -198,8 +257,9 @@
 
     //depends on test "set_waiting"
     test("clear_waiting", function () {
-        view.set_waiting();
-        view.clear_waiting();
+        view.update({isWaiting: true});
+        view.update({isWaiting: false});
+        
         ok(! $('#tc_main_form').hasClass("faded"), "faded class removed");
         ok(! $('#tc_main_form .spinner').html(), "spinner removed");
         deepEqual(
@@ -222,7 +282,7 @@
     test("clear_success", function () {
         view.add_success("test");
         view.add_success("test2")
-        view.clear_success("test");
+        view.clear_success();
         deepEqual(
             $("#tc_main_form .success").html(),
             undefined,

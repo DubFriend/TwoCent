@@ -1,5 +1,4 @@
 //Some Language Add Ons a la "JavaScript the Good Parts"
-
 if(typeof Object.create !== 'function') {
     Object.create = function (o) {
         var F = function () {};
@@ -40,4 +39,3 @@ function get_window_height() {
     }
     return myHeight;
 };
-

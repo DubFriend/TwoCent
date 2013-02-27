@@ -50,24 +50,28 @@ var new_view = function (spec) {
             throw "view.update should be overridden";
         },
         
-        set_waiting: function () {
-            $(id).spin(spinConfig);
-            $(id).addClass("faded");
-            $(id + ' input[type="submit"]').attr("disabled", "disabled");
+        set_waiting: function (optId) {
+            var divId = optId || id;
+            $(divId).spin(spinConfig);
+            $(divId).addClass("faded");
+            $(divId + ' input[type="submit"]').attr("disabled", "disabled");
         },
         
-        clear_waiting: function () {
-            $(id + ' input[type="submit"]').removeAttr("disabled");
-            $(id).removeClass("faded");
-            $(id).spin(false);
+        clear_waiting: function (optId) {
+            var divId = optId || id;
+            $(divId + ' input[type="submit"]').removeAttr("disabled");
+            $(divId).removeClass("faded");
+            $(divId).spin(false);
         },
 
-        add_success: function (message) {
-            $(id).append($('<p class="success">' + message + '</p>')); 
+        add_success: function (message, optId) {
+            var divId = optId || id;
+            $(divId).append($('<p class="success">' + message + '</p>')); 
         },
 
-        clear_success: function () {
-            $(id + " p.success").remove();
+        clear_success: function (optId) {
+            var divId = optId || id;
+            $(divId + " p.success").remove();
         }
     };
 };
@@ -100,19 +104,31 @@ var new_comments_view = function (spec) {
             }
 
             return allComments.join("");
+        },
+        add_comment = function(commentData, parentId) {
+            var $comment = $(build_comments([commentData]));
+            if(parentId) {
+                $(that.id() + ' #tc_' + parentId).append($comment);
+            }
+            else {
+                $(that.id()).prepend($comment);
+            }
         };
 
     that.update = function (data) {
-        $(this.id()).append($(build_comments(data)));
-    };
-
-    that.add_comment = function(commentData, parentId) {
-        var $comment = $(build_comments([commentData]));
-        if(parentId) {
-            $(this.id() + ' #tc_' + parentId).append($comment);
+        if(data.insertComment) {
+            add_comment(data.insertComment['data'], data.insertComment.parentId);
         }
-        else {
-            $(this.id()).prepend($comment);
+        if(data.comments) {
+            $(this.id()).append($(build_comments(data.comments)));
+        }
+        if(data.isWaiting) {
+            if(data.isWaiting === true) {
+                this.set_waiting('#tc_loading_comments');
+            }
+            else if(data.isWaiting === false) {
+                this.clear_waiting('#tc_loading_comments');
+            }
         }
     };
 
@@ -122,8 +138,24 @@ var new_comments_view = function (spec) {
 
 
 var new_form_view = function (spec) {
-    var that = new_view(spec),//Object.create(view),
-        id = that.id();
+    var that = new_view(spec),
+        id = that.id(),
+        clear = function () {
+            $(id + ' input[name = "name"]').val("");
+            $(id + ' [name = "comment"]').html("");
+        },
+        add_error = function (inputName, message) {
+            var $input = $(id + ' [name="' + inputName + '"]')
+            $input.addClass('error');
+            if(message) {
+                $('<span class="error">' + message + '</span>').insertAfter($input);
+            }
+        },
+        clear_error = function () {
+            $(id + ' span.error').remove();
+            $(id + ' .error').removeClass("error");
+        };
+
 
     that.get_data = function () {
         return {
@@ -148,6 +180,37 @@ var new_form_view = function (spec) {
     that.clear_error = function () {
         $(id + ' span.error').remove();
         $(id + ' .error').removeClass("error");
+    };
+
+    that.update = function (data) {
+        var i;
+
+        if(data['clear'] === true) {
+            clear();
+        }
+
+        if(data['error']) {
+            if(data['error'] instanceof Array) {
+                for(i = 0; i < data['error'].length; i++) {
+                    add_error(data['error'][i].inputName, data['error'][i].message);
+                }
+            }
+            else {
+                add_error(data['error'].inputName, data['error'].message);
+            }
+        }
+        else if(data['error'] === false) {
+            if(data['error'] == false) {
+                clear_error();
+            }
+        }
+
+        if(data.isWaiting === true) {
+            this.set_waiting();
+        }
+        else if(data.isWaiting === false) {
+            this.clear_waiting();
+        }
     };
 
     return that;

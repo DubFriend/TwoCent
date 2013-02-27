@@ -20,7 +20,6 @@
     asyncTest("send_request: get", function () {
         expect(2);
         var isSuccessCalled = false;
-
         ajax.send_request({
             url: url + "?type=success",
             success: function (json) {
@@ -36,10 +35,10 @@
                 ok(!isSuccessCalled, "beforeSend called, before response");
             }
         });
-
     });
-
 }());
+
+
 
 (function () {
     var model,
@@ -58,12 +57,11 @@
                 $('#qunit-fixture').append(
                     '<div id="tc_data">' +
                         '<div id="tc_page_id">1</div>' +
+                    '</div>' +
+                    '<div id="tc_comments">' +
+                        '<div class="comment_wrap" id="tc_3"></div>' +
                     '</div>'
                 );
-
-
-
-
                 send_config = undefined;
                 model = new_comment_model({
                     ajax: {
@@ -72,9 +70,7 @@
                         }
                     }
                 });
-
                 model.init();
-
                 model.subscribe(subscriber);
             }
         }
@@ -85,7 +81,7 @@
         model.get_next_comments();
         deepEqual(
             send_config.url,
-            "index.php?act=next_comments&page=1",
+            "index.php?act=next_comments&page=1&last_id=3",
             "correct url"
         );
 

@@ -24,6 +24,7 @@ var new_ajax = function () {
 };
 
 
+
 var model = (function () {
     var subscribers = [],
         pageId = undefined,
@@ -57,6 +58,7 @@ var model = (function () {
 }());
 
 
+
 var new_model = function (spec) {
     var that = Object.create(model),
         ajax = spec.ajax || new_ajax();
@@ -68,10 +70,12 @@ var new_model = function (spec) {
     return that;
 };
 
+
+
 //should only be one instance of comment_model
 var new_comment_model = function (spec) {
     var that = new_model(spec),
-        lastCommentId = undefined,
+        lastCommentId = $("#tc_comments > .comment_wrap").last().attr("id").slice(3),
         nextCommentsUrl = spec.nextCommentsUrl || "index.php?act=next_comments",
         build_url = function (pageId, lastCommentId) {
             var url = nextCommentsUrl + "&page=" + pageId;
@@ -114,6 +118,7 @@ var new_form_model = function (spec) {
 
     return that;
 };
+
 
 
 var new_response_form_model = function (spec) {
