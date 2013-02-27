@@ -51,23 +51,23 @@ var new_view = function (spec) {
         },
         
         set_waiting: function () {
-            $("#twocent " + id).spin(spinConfig);
-            $("#twocent " + id).addClass("faded");
-            $("#twocent " + id + ' input[type="submit"]').attr("disabled", "disabled");
+            $(id).spin(spinConfig);
+            $(id).addClass("faded");
+            $(id + ' input[type="submit"]').attr("disabled", "disabled");
         },
         
         clear_waiting: function () {
-            $("#twocent " + id + ' input[type="submit"]').removeAttr("disabled");
-            $("#twocent " + id).removeClass("faded");
-            $("#twocent " + id).spin(false);
+            $(id + ' input[type="submit"]').removeAttr("disabled");
+            $(id).removeClass("faded");
+            $(id).spin(false);
         },
 
         add_success: function (message) {
-            $("#twocent " + id).append($('<p class="success">' + message + '</p>')); 
+            $(id).append($('<p class="success">' + message + '</p>')); 
         },
 
         clear_success: function () {
-            $("#twocent " + id + " p.success").remove();
+            $(id + " p.success").remove();
         }
     };
 };
@@ -75,7 +75,7 @@ var new_view = function (spec) {
 
 
 var new_comments_view = function (spec) {
-    spec['id'] = spec['id'] || "#comments";
+    spec['id'] = spec['id'] || "#tc_comments";
     var that = new_view(spec),
         template = spec.template,
         build_comments = function (comments) {
@@ -88,7 +88,7 @@ var new_comments_view = function (spec) {
                 com = comments[i];
                 $comment = $(template);
 
-                $comment.attr('id', 'twocent_' + com['id']);
+                $comment.attr('id', 'tc_' + com['id']);
                 $comment.find('.name').html(com['name']);
                 $comment.find('.comment').html(com.comment);
                 $comment.find('.date').html(com.date);
@@ -103,16 +103,16 @@ var new_comments_view = function (spec) {
         };
 
     that.update = function (data) {
-        $("#twocent " + this.id()).append($(build_comments(data)));
+        $(this.id()).append($(build_comments(data)));
     };
 
     that.add_comment = function(commentData, parentId) {
         var $comment = $(build_comments([commentData]));
         if(parentId) {
-            $('#twocent ' + this.id() + ' #twocent_' + parentId).append($comment);
+            $(this.id() + ' #tc_' + parentId).append($comment);
         }
         else {
-            $('#twocent ' + this.id()).prepend($comment);
+            $(this.id()).prepend($comment);
         }
     };
 
@@ -127,18 +127,18 @@ var new_form_view = function (spec) {
 
     that.get_data = function () {
         return {
-            "name": $('#twocent ' + id + ' input[name="name"]').val().trim(),
-            "comment": $('#twocent ' + id + ' [name="comment"]').html().trim()
+            "name": $(id + ' input[name="name"]').val().trim(),
+            "comment": $(id + ' [name="comment"]').html().trim()
         };
     };
 
     that.clear = function () {
-        $('#twocent ' + id + ' input[name = "name"]').val("");
-        $('#twocent ' + id + ' [name = "comment"]').html("");
+        $(id + ' input[name = "name"]').val("");
+        $(id + ' [name = "comment"]').html("");
     };
 
     that.add_error = function (inputName, message) {
-        var $input = $('#twocent ' + id + ' [name="' + inputName + '"]')
+        var $input = $(id + ' [name="' + inputName + '"]')
         $input.addClass('error');
         if(message) {
             $('<span class="error">' + message + '</span>').insertAfter($input);
@@ -146,8 +146,8 @@ var new_form_view = function (spec) {
     };
 
     that.clear_error = function () {
-        $('#twocent ' + id + ' span.error').remove();
-        $('#twocent ' + id + ' .error').removeClass("error");
+        $(id + ' span.error').remove();
+        $(id + ' .error').removeClass("error");
     };
 
     return that;
@@ -157,8 +157,8 @@ var new_form_view = function (spec) {
 
 var new_main_form_view = function (spec) {
     spec = spec || {};
-    spec['id'] = spec['id'] || "#main_form";
-    var that = new_form_view(spec);//new_form_view({formId: "#main_form"});
+    spec['id'] = spec['id'] || "#tc_main_form";
+    var that = new_form_view(spec);
     return that;
 };
 
@@ -166,12 +166,12 @@ var new_main_form_view = function (spec) {
 
 var new_response_form_view = function (spec) {
     spec = spec || {};
-    spec['id'] = spec['id'] || "#response_form";
-    var that = new_form_view(spec),//new_form_view({formId: "#response_form"}),
+    spec['id'] = spec['id'] || "#tc_response_form";
+    var that = new_form_view(spec),
         template = spec.template;
 
     that.set = function (commentId) {
-        $('#response_form').remove();
+        $(this.id()).remove();
         $(template).insertAfter($(commentId + ' .response_button'));
     };
 

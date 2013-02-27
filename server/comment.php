@@ -170,13 +170,12 @@ class View {
 
 	function build_comment_system(array $comments = NULL, $pageId) {
 		return "
-		<div id='comment_system'>
-			<div id='comment_data' style='display:none;height:0px;'>
-				
-				<div id='page_id'>$pageId</div>
-				<div id='templates'>
-					<div id='comment_template'>" . $this->build_comment() ."</div>
-					<div id='response_form_template'>" . $this->build_response_form() . "</div>
+		<div id='twocent'>
+			<div id='tc_data' style='display:none;height:0px;'>
+				<div id='tc_page_id'>$pageId</div>
+				<div id='tc_templates'>
+					<div id='tc_comment_template'>" . $this->build_comment() ."</div>
+					<div id='tc_response_form_template'>" . $this->build_response_form() . "</div>
 				</div>
 			</div>
 			" . $this->build_main_comment_form('main_form') . "
