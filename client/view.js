@@ -80,18 +80,19 @@ var new_view = function (spec) {
 
 var new_comments_view = function (spec) {
     spec['id'] = spec['id'] || "#tc_comments";
+    
     var that = new_view(spec),
         template = spec.template,
+        
         build_comments = function (comments) {
-            var i,
-                com,
+            var i, com,
                 $comment,
                 allComments = [];
 
             for(i = 0; i < comments.length; i += 1) {
                 com = comments[i];
-                $comment = $(template);
 
+                $comment = $(template);
                 $comment.attr('id', 'tc_' + com['id']);
                 $comment.find('.name').html(com['name']);
                 $comment.find('.comment').html(com.comment);
@@ -105,6 +106,7 @@ var new_comments_view = function (spec) {
 
             return allComments.join("");
         },
+
         add_comment = function(commentData, parentId) {
             var $comment = $(build_comments([commentData]));
             if(parentId) {
@@ -140,20 +142,60 @@ var new_comments_view = function (spec) {
 var new_form_view = function (spec) {
     var that = new_view(spec),
         id = that.id(),
+
         clear = function () {
             $(id + ' input[name = "name"]').val("");
             $(id + ' [name = "comment"]').html("");
         },
+
         add_error = function (inputName, message) {
             var $input = $(id + ' [name="' + inputName + '"]')
+            
             $input.addClass('error');
             if(message) {
                 $('<span class="error">' + message + '</span>').insertAfter($input);
             }
         },
+
         clear_error = function () {
             $(id + ' span.error').remove();
             $(id + ' .error').removeClass("error");
+        },
+
+        update_error = function (error) {
+            var i;
+            
+            if(error) {
+                if(error instanceof Array) {
+                    for(i = 0; i < error.length; i++) {
+                        add_error(error[i].inputName, error[i].message);
+                    }
+                }
+                else {
+                    add_error(error.inputName, error.message);
+                }
+            }
+            else if(error === false) {
+                clear_error();
+            }
+        },
+
+        update_success = function (message) {
+            if(message) {
+                that.add_success(message);
+            }
+            else if(message === false) {
+                that.clear_success();
+            }
+        },
+
+        update_waiting = function (isWaiting) {
+            if(isWaiting === true) {
+                that.set_waiting();
+            }
+            else if(isWaiting === false) {
+                that.clear_waiting();
+            }
         };
 
 
@@ -164,53 +206,13 @@ var new_form_view = function (spec) {
         };
     };
 
-    that.clear = function () {
-        $(id + ' input[name = "name"]').val("");
-        $(id + ' [name = "comment"]').html("");
-    };
-
-    that.add_error = function (inputName, message) {
-        var $input = $(id + ' [name="' + inputName + '"]')
-        $input.addClass('error');
-        if(message) {
-            $('<span class="error">' + message + '</span>').insertAfter($input);
-        }
-    };
-
-    that.clear_error = function () {
-        $(id + ' span.error').remove();
-        $(id + ' .error').removeClass("error");
-    };
-
     that.update = function (data) {
-        var i;
-
-        if(data['clear'] === true) {
+        if(data.clear === true) {
             clear();
         }
-
-        if(data['error']) {
-            if(data['error'] instanceof Array) {
-                for(i = 0; i < data['error'].length; i++) {
-                    add_error(data['error'][i].inputName, data['error'][i].message);
-                }
-            }
-            else {
-                add_error(data['error'].inputName, data['error'].message);
-            }
-        }
-        else if(data['error'] === false) {
-            if(data['error'] == false) {
-                clear_error();
-            }
-        }
-
-        if(data.isWaiting === true) {
-            this.set_waiting();
-        }
-        else if(data.isWaiting === false) {
-            this.clear_waiting();
-        }
+        update_error(data.error);
+        update_success(data.success);
+        update_waiting(data.isWaiting);        
     };
 
     return that;
@@ -221,7 +223,9 @@ var new_form_view = function (spec) {
 var new_main_form_view = function (spec) {
     spec = spec || {};
     spec['id'] = spec['id'] || "#tc_main_form";
+    
     var that = new_form_view(spec);
+    
     return that;
 };
 
@@ -230,13 +234,24 @@ var new_main_form_view = function (spec) {
 var new_response_form_view = function (spec) {
     spec = spec || {};
     spec['id'] = spec['id'] || "#tc_response_form";
+    
     var that = new_form_view(spec),
-        template = spec.template;
+        template = spec.template,
 
-    that.set = function (commentId) {
-        $(this.id()).remove();
-        $(template).insertAfter($(commentId + ' .response_button'));
-    };
+        set = function (commentId) {
+            $(that.id()).remove();
+            $(template).insertAfter($('#tc_' + commentId + ' .response_button'));
+        };
+
+    //closure here to retain access to parents update method.
+    that.update = (function (parent_update) {
+        return function (data) {
+            parent_update.apply(this, [data]);
+            if(data.set) {
+                set(data.set);
+            }
+        };
+    }(that.update));
 
     return that;
 };

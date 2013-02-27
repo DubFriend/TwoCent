@@ -22,18 +22,20 @@
         {
             setup: function () {
                 var template = "" +
-                '<div class="comment_wrap">' +
-                    '<div class="name"></div>' +
-                    '<div class="comment"></div>' +
-                    '<div class="date"></div>' +
-                    '<button class="response_button" type="button">Response</button>' +
-                '</div>';
+                    '<div class="comment_wrap">' +
+                        '<div class="name"></div>' +
+                        '<div class="comment"></div>' +
+                        '<div class="date"></div>' +
+                        '<button class="response_button" type="button">Response</button>' +
+                    '</div>';
 
                 $('#qunit-fixture').append(
                     '<div id="twocent">' +
                         '<div id="tc_comments"></div>' +
                         '<div id="tc_loading_comments"></div>' +
-                    '</div>');
+                    '</div>'
+                );
+                
                 view = new_comments_view({
                     template: template
                 });
@@ -142,8 +144,6 @@
 
 
 
-
-
 (function () {
     var view;
     module(
@@ -151,13 +151,13 @@
         {
             setup: function () {
                 var html = "" +
-                '<div id="twocent">' +
-                    '<form id="tc_main_form">' +
-                        '<input type="text" name="name"/>' +
-                        '<textarea name="comment"></textarea>' +
-                        '<input type="submit" disabled/>' +
-                    '</form>' +
-                '</div>';
+                    '<div id="twocent">' +
+                        '<form id="tc_main_form">' +
+                            '<input type="text" name="name"/>' +
+                            '<textarea name="comment"></textarea>' +
+                            '<input type="submit" disabled/>' +
+                        '</form>' +
+                    '</div>';
 
                 $('#qunit-fixture').append(html);
 
@@ -181,8 +181,9 @@
     test("clear", function () {
         $('#tc_main_form input[name="name"]').val(" bob ");
         $('#tc_main_form [name="comment"]').html(" bob comment ");
-        //view.clear();
+
         view.update({clear:true});
+        
         deepEqual(
             {
                 "name": $('#tc_main_form input[name="name"]').val(),
@@ -196,13 +197,10 @@
     });
 
     test("add_error", function () {
-        //view.add_error("name", "message");
         view.update({
-            error: {
-                inputName: "name",
-                message: "message"
-            }
+            error: {inputName: "name", message: "message"}
         });
+
         ok($('#tc_main_form input[name="name"]').hasClass("error"), "error class added to input");
         deepEqual($("#tc_main_form span.error").html(), "message", "message added.");
     });
@@ -210,16 +208,11 @@
     test("add array of errors", function () {
         view.update({
             error: [
-                {
-                    inputName: "name",
-                    message: "message"
-                },
-                {
-                    inputName: "comment",
-                    message: "another"
-                }
+                {inputName: "name", message: "message"},
+                {inputName: "comment", message: "another"}
             ]
         });
+
         ok($('#tc_main_form input[name="name"]').hasClass("error"), "error class added to name input");
         ok($('#tc_main_form [name="comment"]').hasClass("error"), "error class added to comment input");
         deepEqual($("#tc_main_form span.error").first().html(), "message", "first message added.");
@@ -229,10 +222,7 @@
     //depends on test "add_error"
     test("clear_error", function () {
         view.update({
-            error: {
-                inputName: "name",
-                message: "message"
-            }
+            error: {inputName: "name", message: "message"}
         });
 
         view.update({
@@ -270,7 +260,8 @@
     });
 
     test("add_success", function () {
-        view.add_success("test");
+        view.update({success: "test"});
+        
         deepEqual(
             $("#tc_main_form .success").html(),
             "test",
@@ -280,9 +271,10 @@
 
     //depends on test "add_success"
     test("clear_success", function () {
-        view.add_success("test");
-        view.add_success("test2")
-        view.clear_success();
+        view.update({success: "test"});
+        view.update({success: "test"});
+        view.update({success: false});
+        
         deepEqual(
             $("#tc_main_form .success").html(),
             undefined,
@@ -292,8 +284,12 @@
 
 }());
 
+
+
 (function () {
-    var view, template;
+    var view,
+        template;
+    
     module(
         "response form view",
         {
@@ -334,14 +330,16 @@
     );
 
     test("set", function () {
-        view.set("#tc_1");
+        view.update({set: 1});
+        
         deepEqual(
             $("#tc_1 > #tc_response_form").prop("outerHTML"),
             $(template).prop("outerHTML"),
             "adds new form"
         );
 
-        view.set("#tc_2");
+        view.update({set: 2});
+
         deepEqual(
             $("#tc_1 > #tc_response_form").prop("outerHTML"),
             undefined,
@@ -357,10 +355,10 @@
 
     //depends on test "set"
     test("get_data", function () {
-        view.set("#tc_1");
-
+        view.update({set: 1});
         $('#tc_response_form input[name="name"]').val(" bob ");
         $('#tc_response_form [name="comment"]').html(" bob comment ");
+        
         deepEqual(
             view.get_data(),
             {
@@ -370,5 +368,12 @@
         );
     });
 
+    //depends on test "set"
+    test("test inherits parent update", function () {
+        view.update({set: 1});
+        view.update({isWaiting: true});
+        
+        ok($('#tc_response_form').hasClass('faded'));
+    })
 
 }());

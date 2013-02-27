@@ -3,9 +3,11 @@ var new_ajax = function () {
         send_request: function (spec) {
             var type = spec['type'] || 'GET',
                 dataType = spec.dataType || 'json',
+                
                 error = spec['error'] || function (jqXHR, textStatus, errorThrown) {
                     alert("ajax ERROR : \n" + errorThrown + "\n" + textStatus);
                 },
+                
                 success = spec.success || function(json) { 
                     alert(JSON.stringify(json)); 
                 };
@@ -42,15 +44,18 @@ var model = (function () {
                 isAllreadyInit = true;
             }
         },
+
         publish: function (data) {
             var i;
             for(i = 0; i < subscribers.length; i += 1) {
                 subscribers[i].update(data);
             }
         },
+        
         subscribe: function (view) {
             subscribers.push(view);
         },
+        
         page_id: function () {
             return pageId;
         }
@@ -77,6 +82,7 @@ var new_comment_model = function (spec) {
     var that = new_model(spec),
         lastCommentId = $("#tc_comments > .comment_wrap").last().attr("id").slice(3),
         nextCommentsUrl = spec.nextCommentsUrl || "index.php?act=next_comments",
+        
         build_url = function (pageId, lastCommentId) {
             var url = nextCommentsUrl + "&page=" + pageId;
             if(lastCommentId) {

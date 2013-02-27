@@ -1,11 +1,13 @@
 (function () {
     var ajax,
-    url = "ajax.php";
+        url = "ajax.php";
+    
     module(
         "ajax test",
         {
             setup: function () {
                 ajax = new_ajax();
+
                 $('#qunit-fixture').append(
                     '<div id="twocent">' +
                         '<form id="test_form">' +
@@ -19,7 +21,9 @@
 
     asyncTest("send_request: get", function () {
         expect(2);
+        
         var isSuccessCalled = false;
+        
         ajax.send_request({
             url: url + "?type=success",
             success: function (json) {
@@ -62,7 +66,9 @@
                         '<div class="comment_wrap" id="tc_3"></div>' +
                     '</div>'
                 );
+                
                 send_config = undefined;
+                
                 model = new_comment_model({
                     ajax: {
                         send_request: function (config) {
@@ -79,6 +85,7 @@
 
     test("get_next_comments", function () {
         model.get_next_comments();
+        
         deepEqual(
             send_config.url,
             "index.php?act=next_comments&page=1&last_id=3",
@@ -93,7 +100,7 @@
             "isWaiting before response published"
         );
 
-        send_config.success.apply(model, [[{ //note: apply takes an array of the arguments.
+        send_config.success.apply(model, [[{
             "id": 4
         }]]);
 
@@ -109,6 +116,7 @@
         );
 
         model.get_next_comments();
+
         deepEqual(
             send_config.url,
             "index.php?act=next_comments&page=1&last_id=4",
