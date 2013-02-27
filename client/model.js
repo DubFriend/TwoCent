@@ -1,7 +1,7 @@
 var new_ajax = function () {
     return {
         send_request: function (spec) {
-            var type = spec['type'] || 'get',
+            var type = spec['type'] || 'GET',
                 dataType = spec.dataType || 'json',
                 error = spec['error'] || function (jqXHR, textStatus, errorThrown) {
                     alert("ajax ERROR : \n" + errorThrown + "\n" + textStatus);
@@ -19,47 +19,28 @@ var new_ajax = function () {
                 beforeSend: spec.beforeSend,
                 success: success
             });
-        },
-
-        bind_form_submit: function(spec) {
-            var statusCallback = spec.statusCallback || function (status) {},
-                validate = spec.validate || function () {
-                    return {
-                        "status": true,
-                        "default": {"status": true}
-                    };
-                };
-
-            spec.FormRef.submit(function(e) {
-                var status = validate();
-                e.preventDefault();
-                if(status['status'] === true) {
-                    if(spec.before) {
-                        //jquery's beforeSend, apparently happens after dom post variables are grabbed.
-                        spec.before();
-                    }
-                    send_ajax_request({
-                        type: "post",
-                        url: spec.url,
-                        data: $(e.target).serialize(),
-                        dataType: spec.dataType,
-                        beforeSend: spec.beforeSend,
-                        success: spec.success,
-                        error: spec['error']
-                    });   
-                }
-                statusCallback(status);
-            });
         }
     };
 };
 
 
-
-
 var model = (function () {
-    var subscribers = [];
+    var subscribers = [],
+        pageId = undefined,
+        templates = {},
+        isAllreadyInit = false;
+
     return {
+        init: function () {
+            if(isAllreadyInit) {
+                throw "can only call init (globally) once.";
+            }
+            else {
+                pageId = $('#tc_page_id').html();
+                $('#tc_page_id').remove();
+                isAllreadyInit = true;
+            }
+        },
         publish: function (data) {
             var i;
             for(i = 0; i < subscribers.length; i += 1) {
@@ -68,32 +49,68 @@ var model = (function () {
         },
         subscribe: function (view) {
             subscribers.push(view);
+        },
+        page_id: function () {
+            return pageId;
         }
     };
 }());
 
 
-var new_comment_model = function (spec) {
+var new_model = function (spec) {
     var that = Object.create(model),
-        comment_data;
-    
+        ajax = spec.ajax || new_ajax();
+
+    that._ajax = function (config) {
+        ajax.send_request(config);
+    };
+
+    return that;
+};
+
+//should only be one instance of comment_model
+var new_comment_model = function (spec) {
+    var that = new_model(spec),
+        lastCommentId = undefined,
+        nextCommentsUrl = spec.nextCommentsUrl || "index.php?act=next_comments",
+        build_url = function (pageId, lastCommentId) {
+            var url = nextCommentsUrl + "&page=" + pageId;
+            if(lastCommentId) {
+                url += "&last_id=" + lastCommentId;
+            }
+            return url;
+        };
+        
     that.get_next_comments = function () {
-        //some ajax calls (seperate object, goes here)
-        this.publish(data);
+        this.publish({
+            isWaiting: true
+        });
+        this._ajax({
+            url: build_url(
+                this.page_id(),
+                lastCommentId
+            ),
+            success: function (json) {
+                this.publish({
+                    isWaiting: false,
+                    comments: json
+                });
+                lastCommentId = json[json.length - 1]["id"];
+            }
+        });
     };
-
-    that.test = function (data) {
-        this.publish(data);
-    };
-
-
 
     return that;
 };
 
 
+
 var new_form_model = function (spec) {
-    var that = Object.create(model);
+    var that = new_model(spec);
+
+    that.get_captcha_key = function () {
+        return "6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG";
+    };
 
     return that;
 };

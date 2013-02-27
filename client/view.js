@@ -1,8 +1,9 @@
+"use strict";
 
-$.fn.spin = function(opts) {
-    this.each(function() {
+$.fn.spin = function (opts) {
+    this.each(function () {
         var $this = $(this),
-        data = $this.data();
+            data = $this.data();
         if (data.spinner) {
             data.spinner.stop();
             delete data.spinner;
@@ -72,6 +73,7 @@ var new_view = function (spec) {
 };
 
 
+
 var new_comments_view = function (spec) {
     spec['id'] = spec['id'] || "#comments";
     var that = new_view(spec),
@@ -117,6 +119,8 @@ var new_comments_view = function (spec) {
     return that;
 };
 
+
+
 var new_form_view = function (spec) {
     var that = new_view(spec),//Object.create(view),
         id = that.id();
@@ -147,7 +151,9 @@ var new_form_view = function (spec) {
     };
 
     return that;
-}
+};
+
+
 
 var new_main_form_view = function (spec) {
     spec = spec || {};
@@ -155,6 +161,8 @@ var new_main_form_view = function (spec) {
     var that = new_form_view(spec);//new_form_view({formId: "#main_form"});
     return that;
 };
+
+
 
 var new_response_form_view = function (spec) {
     spec = spec || {};
