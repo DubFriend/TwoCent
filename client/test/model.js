@@ -125,3 +125,55 @@
     });
 
 }());
+
+
+(function () {
+    var model,
+        sendConfig,
+        publishData,
+        subscriber = {
+            update: function (data) {
+                publishData = data;
+            }
+        },
+        nullEvent = {
+            preventDefault: function () {}
+        };
+
+    module(
+        "form_model",
+        {
+            setup: function () {
+                $('#qunit-fixture').append(
+                    '<div id="twocent">' +
+                        '<form id="tc_main_form">' +
+                            '<input type="text" name="name"/>' +
+                            '<textarea name="comment"></textarea>' +
+                            '<input type="submit" disabled/>' +
+                        '</form>' +
+                        '<div id="tc_page_id">1</div>' +
+                    '</div>'
+                );
+                
+                sendConfig = undefined;
+                
+                model = new_form_model({
+                    ajax: {
+                        send_request: function (config) {
+                            sendConfig = config;
+                        }
+                    }
+                });
+                model.init();
+                model.subscribe(subscriber);
+            }
+        }
+    );
+
+
+    test("submit_comment", function () {
+        model.submit_comment(nullEvent);
+    });
+
+
+}());

@@ -78,11 +78,13 @@ var new_view = function (spec) {
 
 
 
-var new_comments_view = function (spec) {
+var new_comment_view = function (spec) {
+    spec = spec || {};
     spec['id'] = spec['id'] || "#tc_comments";
     
     var that = new_view(spec),
-        template = spec.template,
+        template,
+        isAllreadyInit = false,
         
         build_comments = function (comments) {
             var i, com,
@@ -91,13 +93,11 @@ var new_comments_view = function (spec) {
 
             for(i = 0; i < comments.length; i += 1) {
                 com = comments[i];
-
                 $comment = $(template);
                 $comment.attr('id', 'tc_' + com['id']);
                 $comment.find('.name').html(com['name']);
                 $comment.find('.comment').html(com.comment);
                 $comment.find('.date').html(com.date);
-
                 if(com['children']) {
                     $comment.append(build_comments(com['children']));
                 }
@@ -117,20 +117,31 @@ var new_comments_view = function (spec) {
             }
         };
 
+    that.init = function () {
+        if(isAllreadyInit) {
+            throw "cannot init comment view more than once.";
+        }
+        else {
+            template = spec.template || $('#tc_comment_template').html();
+            $('#tc_comment_template').remove();
+            isAllreadyInit = true;
+        }
+    };
+
     that.update = function (data) {
         if(data.insertComment) {
             add_comment(data.insertComment['data'], data.insertComment.parentId);
         }
+        
         if(data.comments) {
             $(this.id()).append($(build_comments(data.comments)));
         }
-        if(data.isWaiting) {
-            if(data.isWaiting === true) {
-                this.set_waiting('#tc_loading_comments');
-            }
-            else if(data.isWaiting === false) {
-                this.clear_waiting('#tc_loading_comments');
-            }
+        
+        if(data.isWaiting === true) {
+            this.set_waiting('#tc_loading_comments');
+        }
+        else if(data.isWaiting === false) {
+            this.clear_waiting('#tc_loading_comments');
         }
     };
 
@@ -149,11 +160,18 @@ var new_form_view = function (spec) {
         },
 
         add_error = function (inputName, message) {
-            var $input = $(id + ' [name="' + inputName + '"]')
-            
-            $input.addClass('error');
-            if(message) {
-                $('<span class="error">' + message + '</span>').insertAfter($input);
+            var $input,
+                $message = $('<span class="error">' + message + '</span>');
+
+            if(inputName) {
+                $input = $(id + ' [name="' + inputName + '"]');
+                $input.addClass('error');
+                if(message) {
+                    $message.insertAfter($input);
+                }
+            }
+            else if(message) {
+                $(id).append($message);
             }
         },
 
@@ -236,22 +254,19 @@ var new_response_form_view = function (spec) {
     spec['id'] = spec['id'] || "#tc_response_form";
     
     var that = new_form_view(spec),
+        parent_update = that.update,
         template = spec.template,
-
         set = function (commentId) {
             $(that.id()).remove();
             $(template).insertAfter($('#tc_' + commentId + ' .response_button'));
         };
-
-    //closure here to retain access to parents update method.
-    that.update = (function (parent_update) {
-        return function (data) {
-            parent_update.apply(this, [data]);
-            if(data.set) {
-                set(data.set);
-            }
-        };
-    }(that.update));
+        
+    that.update = function (data) {
+        parent_update.apply(this, [data]);
+        if(data.set) {
+            set(data.set);
+        }
+    };
 
     return that;
 };

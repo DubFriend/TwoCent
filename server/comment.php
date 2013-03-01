@@ -253,19 +253,18 @@ class View {
 			$children = get_or_default($passedComment, 'children');
 		}
 
-		$html = "
-		<div class='comment_wrap' id='tc_$id'>
-			<div class='name'>$name</div>
-			<div class='comment'>$comment</div>
-			<div class='date'>$date</div>
-			<button type='button' class='response_button'>Respond</button>";
+		$html = "<div class='comment_wrap' id='tc_$id'>
+<div class='name'>$name</div>
+<div class='comment'>$comment</div>
+<div class='date'>$date</div>
+<button type='button' class='response_button'>Respond</button>";
 			if($children) {
 				foreach($children as $child) {
 					$html .= $this->build_comment($child);
 				}
 			}
-		$html .= "
-		</div>";
+$html .= "
+</div>";
 		return $html;
 	}
 }

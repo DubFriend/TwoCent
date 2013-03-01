@@ -36,9 +36,10 @@
                     '</div>'
                 );
                 
-                view = new_comments_view({
+                view = new_comment_view({
                     template: template
                 });
+                view.init();
             }
         }
     );
@@ -135,8 +136,8 @@
         ok($('#tc_loading_comments .spinner').html(), "spinner added");
 
         view.update({isWaiting:false});
-        ok($('#tc_loading_comments').hasClass('faded'), "faded class removed");
-        ok($('#tc_loading_comments .spinner').html(), "spinner removed");
+        ok(!$('#tc_loading_comments').hasClass('faded'), "faded class removed");
+        ok(!$('#tc_loading_comments .spinner').html(), "spinner removed");
     });
 
 }());
@@ -202,6 +203,13 @@
         });
 
         ok($('#tc_main_form input[name="name"]').hasClass("error"), "error class added to input");
+        deepEqual($("#tc_main_form span.error").html(), "message", "message added.");
+    });
+
+    test("add_error, no inputName", function () {
+        view.update({
+            error: {message: "message"}
+        });
         deepEqual($("#tc_main_form span.error").html(), "message", "message added.");
     });
 
