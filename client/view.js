@@ -41,6 +41,8 @@ var new_view = function (spec) {
             left: 'auto' // Left position relative to parent in px
         };
 
+    $('#tc_main_form input[type="submit"]').removeAttr("disabled");
+
     return {
         id: function () {
             return id;
@@ -129,10 +131,10 @@ var new_comment_view = function (spec) {
     };
 
     that.update = function (data) {
-        if(data.insertComment) {
-            add_comment(data.insertComment['data'], data.insertComment.parentId);
+        if(data.comment) {
+            add_comment(data.comment, data.comment['parent']);
         }
-        
+
         if(data.comments) {
             $(this.id()).append($(build_comments(data.comments)));
         }
@@ -153,6 +155,8 @@ var new_comment_view = function (spec) {
 var new_form_view = function (spec) {
     var that = new_view(spec),
         id = that.id(),
+
+        captcha = spec.captcha || Recaptcha,
 
         clear = function () {
             $(id + ' input[name = "name"]').val("");
@@ -216,6 +220,13 @@ var new_form_view = function (spec) {
             }
         };
 
+    that.create_captcha = function (divId) {
+        captcha.create("6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG", divId, {theme: "clean"});
+    };
+
+    that.init = function () {
+        that.create_captcha("main_recaptcha");
+    };
 
     that.get_data = function () {
         return {
@@ -238,6 +249,7 @@ var new_form_view = function (spec) {
 
 
 
+
 var new_main_form_view = function (spec) {
     spec = spec || {};
     spec['id'] = spec['id'] || "#tc_main_form";
@@ -246,6 +258,7 @@ var new_main_form_view = function (spec) {
     
     return that;
 };
+
 
 
 
@@ -258,8 +271,16 @@ var new_response_form_view = function (spec) {
         template = spec.template,
         set = function (commentId) {
             $(that.id()).remove();
-            $(template).insertAfter($('#tc_' + commentId + ' .response_button'));
+            $(template).insertAfter($('#tc_' + commentId + ' > .response_button'));
+            that.create_captcha("response_recaptcha");
         };
+
+    that.init = function () {
+        if(!template) {
+            template = $('#tc_response_form_template').html();
+        }
+        $('#tc_response_form_template').remove();
+    };
         
     that.update = function (data) {
         parent_update.apply(this, [data]);

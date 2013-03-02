@@ -28,29 +28,16 @@ var new_ajax = function () {
 
 
 var model = (function () {
-    var subscribers = [],
-        pageId = undefined;
+    var pageId = undefined;
 
     return {
         init: function () {
             if(pageId === undefined) {
                 pageId = $('#tc_page_id').html();
                 $('#tc_page_id').remove();
-                isAllreadyInit = true;
             }
         },
 
-        publish: function (data) {
-            var i;
-            for(i = 0; i < subscribers.length; i += 1) {
-                subscribers[i].update(data);
-            }
-        },
-        
-        subscribe: function (view) {
-            subscribers.push(view);
-        },
-        
         page_id: function () {
             return pageId;
         }
@@ -61,7 +48,19 @@ var model = (function () {
 
 var new_model = function (spec) {
     var that = Object.create(model),
-        ajax = spec.ajax || new_ajax();
+        ajax = spec.ajax || new_ajax(),
+        subscribers = [];
+
+    that.publish = function (data) {
+        var i;
+        for(i = 0; i < subscribers.length; i += 1) {
+            subscribers[i].update(data);
+        }
+    };
+
+    that.subscribe = function (view) {
+        subscribers.push(view);
+    };
 
     that._ajax = function (config) {
         ajax.send_request(config);
@@ -77,7 +76,7 @@ var new_comment_model = function (spec) {
     spec = spec || {};
 
     var that = new_model(spec),
-        lastCommentId = $("#tc_comments > .comment_wrap").last().attr("id").slice(3),
+        lastCommentId = $("#tc_comments > .comment_wrap").last().attr("id"),//.slice(3),
         nextCommentsUrl = spec.nextCommentsUrl || "index.php?act=next_comments",
         nextCommentsFlag = true,
         
@@ -88,8 +87,11 @@ var new_comment_model = function (spec) {
             }
             return url;
         };
+
+    lastCommentId = lastCommentId ? lastCommentId.slice(3) : undefined;
         
-    that.get_next_comments = function () {
+    that.get_next_comments = function (on_success_extra) {
+        var on_success_extra = on_success_extra || function () {};
         if(nextCommentsFlag) {
             nextCommentsFlag = false;
             
@@ -109,6 +111,7 @@ var new_comment_model = function (spec) {
                         lastCommentId = json[json.length - 1]["id"];
                     }
                     nextCommentsFlag = true;
+                    on_success_extra();
                 }
             });
         }
@@ -123,50 +126,67 @@ var new_form_model = function (spec) {
     var that = new_model(spec),
         submitCommentUrl = spec.submitCommentUrl || "index.php?act=new_comment",
         formId = spec.formId,
-        validate = spec.validate || function () {
-            return {
-                "status": true,
-                "default": {"status": true}
-            };
-        },
+
         status_callback = spec.status_callback || function (status) {},
+        
+        validate = spec.validate || function () {
+            return {"status": true};
+        },
+        
         get_data = function () {
-            return {
-                "name": $(formId + ' input[name="name"]').val().trim(),
-                "comment": $(formId + ' [name="comment"]').html().trim(),
-                "parent": $(formId + ' input[name=""]').html() || "",
-                "pageId": that.page_id()
-            };
+            var $form = $(formId),
+                name = $form.find('input[name="name"]').val(),
+                comment = $form.find('[name="comment"]').val(),
+                challenge = $form.find('[name="recaptcha_challenge_field"]').val(),
+                response = $form.find('[name="recaptcha_response_field"]').val(),
+
+                data = {
+                    "recaptcha_challenge_field": challenge ? challenge.trim() : "",
+                    "recaptcha_response_field": response ? response.trim() : "",
+                    "name": name ? name.trim() : "",
+                    "comment": comment ? comment.trim() : "",
+                    "pageId": that.page_id()
+                },
+                parentId = get_parent_id();
+
+            if(parentId) {
+                data['parent'] = parentId;
+            }
+            return data;
+        },
+
+        get_parent_id = function () {
+            if(formId === "#tc_response_form") {
+                return $(formId).parent().attr("id").slice(3);
+            }
+        },
+
+        get_captcha_key = function () {
+            return "6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG";
         };
 
-    that.get_captcha_key = function () {
-        return "6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG";
-    };
 
-
-
-
-
-
-
-
-    that.submit_comment = function (e) {
-        e.preventDefault();
-        var status = validate(),
+    that.submit_comment = function (on_success_extra) {
+        var on_success_extra = on_success_extra || function () {},
+            status = validate(),
             formData = get_data();
 
         if(status['status'] === true) {
             
-            this.publish({isWaiting: true});
+            this.publish({
+                isWaiting: true,
+                error: false
+            });
 
             this._ajax({
+                type: "POST",
                 url: submitCommentUrl,
                 data: formData,
                 dataType: spec.dataType || 'json',
                 beforeSend: spec.beforeSend,
                 success: function (json) {
                     if(json['status'] === false) {
-                        this.publish({
+                        that.publish({
                             error: {
                                 message: json['message']
                             }
@@ -174,18 +194,14 @@ var new_form_model = function (spec) {
                     }
                     else {
                         formData['id'] = json['id'];
-                        this.publish({
-                            insertComment: {
-                                data: formData,
-                                parendId: get_parent_id()
-                            }
-                        });
+                        that.publish({comment: formData});
                     }
-                    this.publish({isWaiting: false});
+                    that.publish({isWaiting: false});
+                    on_success_extra();
                 },
                 error: function () {
                     alert("ajax error");
-                    this.publish({isWaiting: false});
+                    that.publish({isWaiting: false});
                 }
             });
 
@@ -193,23 +209,21 @@ var new_form_model = function (spec) {
         status_callback(status);
     };
 
-
-
-    
-
     return that;
 };
 
 var new_main_form_model = function (spec) {
+    spec = spec || {};
     spec.formId = spec.formId || '#tc_main_form';
 
-    var that = new_form(spec);
+    var that = new_form_model(spec);
     return that;
 };
 
 var new_response_form_model = function (spec) {
+    spec = spec || {};
     spec.formId = spec.formId || '#tc_response_form';
 
-    var that = new_form(spec);
+    var that = new_form_model(spec);
     return that;
 };

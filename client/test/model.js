@@ -130,10 +130,11 @@
 (function () {
     var model,
         sendConfig,
-        publishData,
+        publishData = [],
+        statusCallbackResults,
         subscriber = {
             update: function (data) {
-                publishData = data;
+                publishData.push(data);
             }
         },
         nullEvent = {
@@ -141,16 +142,135 @@
         };
 
     module(
-        "form_model",
+        "main form_model",
         {
             setup: function () {
                 $('#qunit-fixture').append(
                     '<div id="twocent">' +
                         '<form id="tc_main_form">' +
-                            '<input type="text" name="name"/>' +
-                            '<textarea name="comment"></textarea>' +
+                            '<input type="text" name="name" value="bob"/>' +
+                            '<textarea name="comment">bob message</textarea>' +
                             '<input type="submit" disabled/>' +
                         '</form>' +
+                        '<div id="tc_page_id">1</div>' +
+                    '</div>'
+                );
+                
+                sendConfig = undefined;
+                statusCallbackResults = undefined;
+                
+                model = new_form_model({
+                    ajax: {
+                        send_request: function (config) {
+                            sendConfig = config;
+                        }
+                    },
+                    formId: "#tc_main_form",
+                    status_callback: function (status) {
+                        statusCallbackResults = status;
+                    }
+                });
+                model.init();
+                model.subscribe(subscriber);
+            }
+        }
+    );
+
+
+    test("submit_comment", function () {
+        model.submit_comment();
+
+        deepEqual(
+            sendConfig.url,
+            "index.php?act=new_comment",
+            "correct url"
+        );
+
+        deepEqual(
+            publishData.pop(),
+            {isWaiting: true, error: false},
+            "isWaiting before response published"
+        );
+
+        sendConfig.success.apply(model, [{
+            "id": 4
+        }]);
+
+        deepEqual(
+            publishData.pop(),
+            {isWaiting: false},
+            "isWaiting published false on success"
+        );
+
+        deepEqual(
+            publishData.pop(),
+            {
+                "comment": {
+                    "comment": "bob message",
+                    "id": 4,
+                    "name": "bob",
+                    "pageId": "1",
+                    "recaptcha_challenge_field": "",
+                    "recaptcha_response_field": ""
+                }
+            },
+            "published correct data on success"
+        );
+
+        deepEqual(
+            statusCallbackResults,
+            {"status": true},
+            "status callback is called."
+        );
+
+        sendConfig.success.apply(model, [{
+            "status": false,
+            "message": "foo"
+        }]);
+
+        publishData.pop();
+
+        deepEqual(
+            publishData.pop(),
+            {
+                error: {message:"foo"}
+            },
+            "publishes error message"
+        );
+    });
+
+
+}());
+
+
+
+
+(function () {
+    var model,
+        sendConfig,
+        publishData = [],
+        subscriber = {
+            update: function (data) {
+                publishData.push(data);
+            }
+        },
+        nullEvent = {
+            preventDefault: function () {}
+        };
+
+    module(
+        "response form model",
+        {
+            setup: function () {
+                $('#qunit-fixture').append(
+                    '<div id="twocent">' +
+                        '<div id="2">' +
+                            '<form id="tc_response_form">' +
+                                '<input type="text" name="name" value="bob"/>' +
+                                '<textarea name="comment">bob message</textarea>' +
+                                '<input type="submit"/>' +
+                            '</form>' +
+                        '</div>' +
                         '<div id="tc_page_id">1</div>' +
                     '</div>'
                 );
@@ -162,7 +282,8 @@
                         send_request: function (config) {
                             sendConfig = config;
                         }
-                    }
+                    },
+                    formId: "#tc_response_form"
                 });
                 model.init();
                 model.subscribe(subscriber);
@@ -172,7 +293,28 @@
 
 
     test("submit_comment", function () {
-        model.submit_comment(nullEvent);
+        model.submit_comment();
+
+        sendConfig.success.apply(model, [{
+            "id": 4
+        }]);
+
+        publishData.pop();
+           
+        deepEqual(
+            publishData.pop(),
+            {
+                "comment": {
+                    "comment": "bob message",
+                    "id": 4,
+                    "name": "bob",
+                    "pageId": "1",
+                    "recaptcha_challenge_field": "",
+                    "recaptcha_response_field": ""
+                }
+            },
+            "published correct data on success"
+        );       
     });
 
 

@@ -77,16 +77,14 @@
             "id": "3",
             "name": "will",
             "comment": "willcomment",
+            "parent": "2",
             "date": "date3"
         };
 
         view.update({comments:[get_comments()]});
 
         view.update({
-            insertComment: {
-                data: singleComment,
-                parentId: 2
-            }
+            comment: singleComment
         });
 
         singleComment['id'] = "tc_3";
@@ -96,7 +94,8 @@
                 "id": $('#tc_2 #tc_3').attr("id"),
                 "name": $("#tc_2 #tc_3 > .name").html(),
                 "comment": $("#tc_2 #tc_3 > .comment").html(),
-                "date": $("#tc_2 #tc_3 > .date").html()
+                "date": $("#tc_2 #tc_3 > .date").html(),
+                "parent": "2"
             },
             singleComment
         );
@@ -114,7 +113,7 @@
         view.update({comments:[get_comments()]});
 
         view.update({
-            insertComment: {data: singleComment}
+            comment: singleComment
         });
 
         singleComment['id'] = "tc_3";
@@ -162,7 +161,9 @@
 
                 $('#qunit-fixture').append(html);
 
-                view = new_main_form_view();
+                view = new_main_form_view({captcha: {
+                    create: function () {}
+                }});
             }
         }
     );
@@ -332,7 +333,13 @@
 
                 $('#qunit-fixture').append(html);
 
-                view = new_response_form_view({template: template});
+                
+                view = new_response_form_view({
+                    template: template,
+                    captcha: {
+                        create: function () {}
+                    }
+                });
             }
         }
     );

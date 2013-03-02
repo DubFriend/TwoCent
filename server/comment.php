@@ -46,8 +46,8 @@ class Controller {
 		return $this->Captcha->is_valid(
 			$this->Model->captcha_key(),
 			$this->server['REMOTE_ADDR'],
-			$this->post["recaptcha_challenge_field"],
-			$this->post["recaptcha_response_field"]
+			\comment_system\get_or_default($this->post, "recaptcha_challenge_field"),
+			\comment_system\get_or_default($this->post, "recaptcha_response_field")
 		);
 	}
 
@@ -60,6 +60,7 @@ class Controller {
 
 class ReCaptcha {
 	function is_valid($key, $ip, $challenge, $response) {
+//echo "$key $ip $challenge $response";
 		$resp = recaptcha_check_answer (
 			$key,
 			$ip,
@@ -206,13 +207,12 @@ class View {
 	}
 
 	private function build_response_form() {
-		return "
-		<form id='tc_response_form'>
-			<input type='text' name='name' placeholder='Your Name Here.'/>
-			<textarea name='comment' placeholder='Enter a cool comment :)'></textarea>
-			<div id='recaptcha'></div>
-			<input type='submit' value='Submit response'>
-		</form>";
+		return "<form id='tc_response_form'>
+<input type='text' name='name' placeholder='Your Name Here.'/>
+<textarea name='comment' placeholder='Enter a cool comment :)'></textarea>
+<div id='response_recaptcha'></div>
+<input type='submit' value='Submit response'>
+</form>";
 	}
 
 	private function build_main_comment_form($id = NULL, $class = NULL) {
@@ -228,7 +228,7 @@ class View {
 			<div><label>Comment</label>
 				<textarea name='comment' placeholder='Enter a cool comment :)'></textarea>
 			</div>
-			<div id='recaptcha'></div>
+			<div id='main_recaptcha'></div>
 			<input type='submit' value='Submit a new comment' disabled/>
 		</form>";
 	}
