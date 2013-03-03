@@ -212,7 +212,8 @@
                     "pageId": "1",
                     "recaptcha_challenge_field": "",
                     "recaptcha_response_field": ""
-                }
+                },
+                "success": "Your message has been posted!"
             },
             "published correct data on success"
         );
@@ -311,7 +312,8 @@
                     "pageId": "1",
                     "recaptcha_challenge_field": "",
                     "recaptcha_response_field": ""
-                }
+                },
+                "success": "Your message has been posted!"
             },
             "published correct data on success"
         );       

@@ -162,7 +162,8 @@
                 $('#qunit-fixture').append(html);
 
                 view = new_main_form_view({captcha: {
-                    create: function () {}
+                    create: function () {},
+                    reload: function () {}
                 }});
             }
         }

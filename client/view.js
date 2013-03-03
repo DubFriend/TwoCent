@@ -159,8 +159,10 @@ var new_form_view = function (spec) {
         captcha = spec.captcha || Recaptcha,
 
         clear = function () {
+            var $comment = $(id + ' [name = "comment"]');
             $(id + ' input[name = "name"]').val("");
-            $(id + ' [name = "comment"]').html("");
+            $comment.val("");
+            $comment.html("");
         },
 
         add_error = function (inputName, message) {
@@ -205,6 +207,11 @@ var new_form_view = function (spec) {
         update_success = function (message) {
             if(message) {
                 that.add_success(message);
+                clear();
+                that.reload_captcha();
+                setTimeout(function () {
+                    that.clear_success();
+                }, 5000);
             }
             else if(message === false) {
                 that.clear_success();
@@ -224,6 +231,10 @@ var new_form_view = function (spec) {
         captcha.create("6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG", divId, {theme: "clean"});
     };
 
+    that.reload_captcha = function () {
+        captcha.reload();
+    };
+
     that.init = function () {
         that.create_captcha("main_recaptcha");
     };
@@ -238,6 +249,7 @@ var new_form_view = function (spec) {
     that.update = function (data) {
         if(data.clear === true) {
             clear();
+            that.reload_captcha();
         }
         update_error(data.error);
         update_success(data.success);

@@ -15,8 +15,8 @@ var new_controller = function (spec) {
             });
         },
 
-        bind_form = function (formId, formModel) {
-            $(formId).submit(function(e) {
+        bind_form = function (formModel) {
+            $(formModel.form_id()).submit(function(e) {
                 e.preventDefault();
                 formModel.submit_comment(function () {
                     bind_response_buttons();
@@ -29,13 +29,13 @@ var new_controller = function (spec) {
             $("#twocent .response_button").click(function() {
                 var id = $(this).parent().attr("id").slice(3);
                 responseFormView.update({set:id});
-                bind_form("#tc_response_form", responseFormModel);
+                bind_form(responseFormModel);
             });
         };
 
     that.init = function () {
         bind_more_comments();
-        bind_form("#tc_main_form", mainFormModel);
+        bind_form(mainFormModel);
         bind_response_buttons();
     };
 

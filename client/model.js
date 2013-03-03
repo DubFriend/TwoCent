@@ -1,3 +1,4 @@
+//simple wrapper ajax call to be mocked out in tests. 
 var new_ajax = function () {
     return {
         send_request: function (spec) {
@@ -76,7 +77,7 @@ var new_comment_model = function (spec) {
     spec = spec || {};
 
     var that = new_model(spec),
-        lastCommentId = $("#tc_comments > .comment_wrap").last().attr("id"),//.slice(3),
+        lastCommentId = $("#tc_comments > .comment_wrap").last().attr("id"),
         nextCommentsUrl = spec.nextCommentsUrl || "index.php?act=next_comments",
         nextCommentsFlag = true,
         
@@ -159,12 +160,11 @@ var new_form_model = function (spec) {
             if(formId === "#tc_response_form") {
                 return $(formId).parent().attr("id").slice(3);
             }
-        },
-
-        get_captcha_key = function () {
-            return "6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG";
         };
 
+    that.form_id = function () {
+        return formId;
+    };
 
     that.submit_comment = function (on_success_extra) {
         var on_success_extra = on_success_extra || function () {},
@@ -194,7 +194,10 @@ var new_form_model = function (spec) {
                     }
                     else {
                         formData['id'] = json['id'];
-                        that.publish({comment: formData});
+                        that.publish({
+                            comment: formData,
+                            success: "Your message has been posted!"
+                        });
                     }
                     that.publish({isWaiting: false});
                     on_success_extra();
