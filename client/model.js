@@ -128,10 +128,50 @@ var new_form_model = function (spec) {
         submitCommentUrl = spec.submitCommentUrl || "index.php?act=new_comment",
         formId = spec.formId,
 
-        status_callback = spec.status_callback || function (status) {},
-        
         validate = spec.validate || function () {
             return {"status": true};
+        },
+
+        status_callback = spec.status_callback || function (status) {
+            var fine_grained_response = function (statusItem, inputName) {
+                var error = {inputName: inputName};
+                
+                if(statusItem.status === false) {
+                    if(statusItem.isnt_short === false) {
+                        error.message = "input is too short.";
+                    }
+                    else if(statusItem.isnt_long === false) {
+                        error.message = "input is too long.";
+                    }
+                }
+
+                that.publish({error:error});
+            };
+
+            that.publish({
+                error: false
+            });
+
+            if(status.status === false) {
+                fine_grained_response(status.name, "name");
+                fine_grained_response(status.comment, "comment");
+                /*if(status.name.status === false) {
+                    that.publish({
+                        error: {
+                            inputName: "name",
+                            message: "invalid name"
+                        }
+                    });
+                }
+                if(status.comment.status === false) {
+                    that.publish({
+                        error: {
+                            inputName: "comment",
+                            message: "invalid comment"
+                        }
+                    });
+                }*/
+            }
         },
         
         get_data = function () {
@@ -168,8 +208,11 @@ var new_form_model = function (spec) {
 
     that.submit_comment = function (on_success_extra) {
         var on_success_extra = on_success_extra || function () {},
-            status = validate(),
-            formData = get_data();
+            formData = get_data(),
+            status = validate({
+                name: formData['name'],
+                comment: formData.comment
+            });
 
         if(status['status'] === true) {
             
@@ -189,7 +232,8 @@ var new_form_model = function (spec) {
                         that.publish({
                             error: {
                                 message: json['message']
-                            }
+                            },
+                            clear_captcha: true
                         });
                     }
                     else {

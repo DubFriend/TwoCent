@@ -231,6 +231,8 @@ var new_form_view = function (spec) {
         captcha.create("6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG", divId, {theme: "clean"});
     };
 
+   
+
     that.reload_captcha = function () {
         captcha.reload();
     };
@@ -249,6 +251,9 @@ var new_form_view = function (spec) {
     that.update = function (data) {
         if(data.clear === true) {
             clear();
+            that.reload_captcha();
+        }
+        if(data.clear_captcha === true) {
             that.reload_captcha();
         }
         update_error(data.error);
@@ -282,6 +287,7 @@ var new_response_form_view = function (spec) {
         parent_update = that.update,
         template = spec.template,
         set = function (commentId) {
+
             $(that.id()).remove();
             $(template).insertAfter($('#tc_' + commentId + ' > .response_button'));
             that.create_captcha("response_recaptcha");
@@ -298,6 +304,12 @@ var new_response_form_view = function (spec) {
         parent_update.apply(this, [data]);
         if(data.set) {
             set(data.set);
+        }
+        if(data.success) {
+            //remove resonse form after delay (to show success message)
+            setTimeout(function () {
+                $(that.id()).remove();
+            }, 5000);
         }
     };
 

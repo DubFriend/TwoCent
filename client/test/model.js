@@ -234,6 +234,7 @@
         deepEqual(
             publishData.pop(),
             {
+                clear_captcha: true,
                 error: {message:"foo"}
             },
             "publishes error message"

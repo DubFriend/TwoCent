@@ -2,6 +2,7 @@ var new_controller = function (spec) {
     var that = {},
         commentModel = spec.commentModel,
         mainFormModel = spec.mainFormModel,
+        mainFormView = spec.mainFormView,
         responseFormModel = spec.responseFormModel,
         responseFormView = spec.responseFormView,
 
@@ -24,6 +25,18 @@ var new_controller = function (spec) {
             });
         },
 
+        bind_main_form_focus = function () {
+            var $form = $(mainFormView.id()),
+                set_captcha = function () {
+                    if(! $('#main_recaptcha').html()) {
+                        mainFormView.create_captcha("main_recaptcha");
+                    }
+                };
+
+            $form.find('input[name="name"]').focus(set_captcha);
+            $form.find('[name="comment"]').focus(set_captcha);
+        },
+
         bind_response_buttons = function () {
             var that = this;
             $("#twocent .response_button").click(function() {
@@ -37,6 +50,7 @@ var new_controller = function (spec) {
         bind_more_comments();
         bind_form(mainFormModel);
         bind_response_buttons();
+        bind_main_form_focus();
     };
 
     return that;

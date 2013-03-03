@@ -198,6 +198,7 @@ class View {
 				<script src='http://www.google.com/recaptcha/api/js/recaptcha_ajax.js'></script>
 				<script src='client/spin.js'></script>
 				<script src='client/lib.js'></script>
+				<script src='client/validator.js'></script>
 				<script src='client/model.js'></script>
 				<script src='client/view.js'></script>
 				<script src='client/controller.js'></script>
