@@ -231,8 +231,6 @@ var new_form_view = function (spec) {
         captcha.create("6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG", divId, {theme: "clean"});
     };
 
-   
-
     that.reload_captcha = function () {
         captcha.reload();
     };
@@ -298,6 +296,10 @@ var new_response_form_view = function (spec) {
             template = $('#tc_response_form_template').html();
         }
         $('#tc_response_form_template').remove();
+    };
+
+    that.remove = function () {
+        $(that.id()).remove();
     };
         
     that.update = function (data) {

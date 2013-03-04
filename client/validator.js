@@ -5,20 +5,10 @@ var new_text_validator = function (config) {
 		//the following methods should return, true/false
 		//(or null if the corresponding config data isn't set)
 		isnt_short = function (text) {
-			if(text.length < minLength) {
-				return false;
-			}
-			else {
-				return true;
-			}
+			return text.length < minLength ? false : true;
 		},
 		isnt_long = function (text) {
-			if(text.length > maxLength) {
-				return false;
-			}
-			else {
-				return true;
-			}
+			return text.length > maxLength ? false : true;
 		},
 		is_regex_pass = function (text) {
 			if(regex) {

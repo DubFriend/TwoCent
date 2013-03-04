@@ -30,6 +30,7 @@ var new_controller = function (spec) {
                 set_captcha = function () {
                     if(! $('#main_recaptcha').html()) {
                         mainFormView.create_captcha("main_recaptcha");
+                        responseFormView.remove();
                     }
                 };
 

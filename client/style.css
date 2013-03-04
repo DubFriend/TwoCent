@@ -16,7 +16,7 @@ html, body {
 
 #tc_main_form {
     background: rgb(243, 243, 243);
-    padding: 0.7em;
+    padding: 1.5em;
     border: 1px solid rgb(146, 146, 146);
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
@@ -40,7 +40,7 @@ html, body {
 #twocent input[type=text], #twocent textarea {
     width: 100%;
     padding: 0.5em;
-    margin: 0.3em 0 0.3em 0;
+    margin: 1em 0 1em 0;
     border: 1px solid rgb(179, 179, 179);
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;

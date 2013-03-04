@@ -134,9 +134,9 @@ var new_form_model = function (spec) {
 
         status_callback = spec.status_callback || function (status) {
             var fine_grained_response = function (statusItem, inputName) {
-                var error = {inputName: inputName};
-                
+                var error = {};
                 if(statusItem.status === false) {
+                    error.inputName = inputName;
                     if(statusItem.isnt_short === false) {
                         error.message = "input is too short.";
                     }
@@ -145,32 +145,14 @@ var new_form_model = function (spec) {
                     }
                 }
 
-                that.publish({error:error});
+                that.publish({error: error});
             };
 
-            that.publish({
-                error: false
-            });
+            that.publish({error: false});
 
             if(status.status === false) {
                 fine_grained_response(status.name, "name");
                 fine_grained_response(status.comment, "comment");
-                /*if(status.name.status === false) {
-                    that.publish({
-                        error: {
-                            inputName: "name",
-                            message: "invalid name"
-                        }
-                    });
-                }
-                if(status.comment.status === false) {
-                    that.publish({
-                        error: {
-                            inputName: "comment",
-                            message: "invalid comment"
-                        }
-                    });
-                }*/
             }
         },
         
