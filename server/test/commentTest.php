@@ -31,15 +31,20 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 	}
 
 	private function create_controller($get = NULL, $post = NULL, $server = NULL, $captcha = NULL) {
-		return new \comment_system\Controller(
-			$get,
-			$post,
-			$server,
-			$this->create_model(),
-			NULL, //view goes here.
-			3, //max comments
-			$captcha //mocked out in insert tests.
+		$config = array(
+			"get" => $get,
+			"post" => $post,
+			"server" => $server,
+			"model" => $this->create_model(),
+			"view" => null,
+			"maxNumComments" => 3
 		);
+
+		if($captcha) {
+			$config['captcha'] = $captcha;
+		}
+		
+		return new \comment_system\Controller($config);
 	}
 
 	private function create_model() {

@@ -1,6 +1,4 @@
 <?php
-//echo "foo";
-
 ini_set('display_errors',1); 
 error_reporting(E_ALL);
 
@@ -9,5 +7,4 @@ switch($_GET['type']) {
 		echo json_encode(array("test" => "success"));
 	break;
 }
-
 ?>
