@@ -309,9 +309,9 @@ var new_response_form_view = function (spec) {
         }
         if(data.success) {
             //remove resonse form after delay (to show success message)
-            setTimeout(function () {
+            //setTimeout(function () {
                 $(that.id()).remove();
-            }, 5000);
+            //}, 5000);
         }
     };
 

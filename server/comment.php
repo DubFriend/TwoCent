@@ -10,20 +10,12 @@ function get_or_default(array $array, $key, $default = NULL) {
 class Controller {
 	private $get,
 	        $post,
+	        $server,
 	        $Model,
 	        $View,
 	        $maxNumComments,
 	        $Captcha;
 
-	/*function __construct(
-				$get,
-				$post,
-				$server,
-				$Model,
-				$View,
-				$maxNumComments = 50,
-				$Captcha = NULL
-		) {*/
 	function __construct(array $config = array()) {
 		$this->get = $config['get'];
 		$this->post = $config['post'];
@@ -32,15 +24,6 @@ class Controller {
 		$this->View = $config['view'];
 		$this->maxNumComments = \comment_system\get_or_default($config, 'maxNumComments', 50);
 		$this->Captcha = isset($config['captcha']) ? $config['captcha'] : new ReCaptcha();
-
-
-		/*$this->get = $get;
-		$this->post = $post;
-		$this->server = $server;
-		$this->Model = $Model;
-		$this->View = $View;
-		$this->maxNumComments = $maxNumComments;
-		$this->Captcha = $Captcha ? $Captcha : new ReCaptcha();*/
 	}
 
 	function get_next($numComments = NULL) {
