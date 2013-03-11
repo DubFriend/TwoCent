@@ -366,13 +366,44 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 	}
 
 	function test_insert_invalid_page_id() {
-		$Ctl = $this->create_controller_override(array("pageId" => 123456));
+		$Ctl = $this->create_controller_override(array("pageId" => 4654));
 		$Ctl->insert_comment();
 		$this->assertEquals(null, $this->select("Comment", 5));
 	}
 
 
+	function test_insert_invalid_date_too_short() {
+		$Ctl = $this->create_controller_override(array("date" => "2013-03-11 01:42:5"));
+		$Ctl->insert_comment();
+		$this->assertEquals(null, $this->select("Comment", 5));
+	}
 
+	function test_insert_invalid_date_too_long() {
+		$Ctl = $this->create_controller_override(array("date" => "2013-03-11 01:42:556"));
+		$Ctl->insert_comment();
+		$this->assertEquals(null, $this->select("Comment", 5));
+	}
 
+	function test_null_parent_ok() {
+		$Ctl = $this->create_controller_override(array("parent" => null));
+		$id = $Ctl->insert_comment()['primary'];
+		$this->assertEquals(
+			array(
+				"id" => $id,
+				"page" => $this->pageAId,
+				"parent" => null,
+				"name" => "mary",
+				"comment" => "mary response",
+				"date" => $this->date1
+			),
+			$this->select("Comment", 5)
+		);
+	}
+
+	function test_invalid_parent_id() {
+		$Ctl = $this->create_controller_override(array("parent" => 45654));
+		$Ctl->insert_comment();
+		$this->assertEquals(null, $this->select("Comment", 5));
+	}
 }
 ?>

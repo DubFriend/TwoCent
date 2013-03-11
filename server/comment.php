@@ -29,8 +29,6 @@ class Controller {
 		//$this->server = \comment_system\get_or_default($config, 'server', array());
 		$this->remoteAddr = \comment_system\get_or_default($config, 'remoteAddr');
 
-
-
 		$Database = $config['database'];
 
 		if(isset($config['pageData'])) {
@@ -251,10 +249,10 @@ class Model {
 
 	function insert_comment(array $post) {
 		$values = $this->DB->filter_array($post);
-		if($this->is_post_valid($values)) {
-			if(!isset($values['date'])) {
-				$values['date'] = date('Y-m-d H:i:s');
-			}
+		if(!isset($values['date'])) {
+			$values['date'] = date('Y-m-d H:i:s');
+		}
+		if($this->is_post_valid($values)) {	
 			if(isset($values['id'])) {
 				unset($values['id']);
 			}
@@ -264,14 +262,31 @@ class Model {
 
 	private function is_post_valid(array $post) {
 		$isPostValid = false;
-		if(
-			$this->is_in_range(\comment_system\get_or_default($post, 'name'), 3, 32)
-			&& $this->is_in_range(\comment_system\get_or_default($post, 'comment'), 10, 2048)
-			&& $this->is_valid_page_id(\comment_system\get_or_default($post, 'pageId'))
+		if($this->is_in_range(\comment_system\get_or_default($post, 'name'), 3, 32)
+		&& $this->is_in_range(\comment_system\get_or_default($post, 'comment'), 10, 2048)
+		&& $this->is_in_range(\comment_system\get_or_default($post, 'date'), 19, 19)
+		&& $this->is_valid_page_id(\comment_system\get_or_default($post, 'pageId'))
+		&& $this->is_valid_parent_id(\comment_system\get_or_default($post, 'parent'))
 		) {
 			$isPostValid = true;
 		}
 		return $isPostValid;
+	}
+
+	private function is_valid_parent_id($id) {
+		$isValidParentId = false;
+		if($id) {  
+			$result = $this->DB->select("@id = ?", array($id));
+			if($result) {
+				if($result->count() == 1) {
+					$isValidParentId = true;
+				}
+			}
+		}
+		else {
+			$isValidParentId = true;
+		}
+		return $isValidParentId;
 	}
 
 	private function is_valid_page_id($id) {

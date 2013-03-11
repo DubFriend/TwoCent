@@ -12,10 +12,7 @@ $Controller = new \comment_system\Controller(array(
 	"database" => $DB,
 	"get" => $_GET,
 	"post" => $_POST,
-	
 	"remoteAddr" => $_SERVER['REMOTE_ADDR']
-	//"server" => $_SERVER,
-	//"pageName" => "pagename"
 ));
 
 
