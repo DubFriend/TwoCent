@@ -10,22 +10,27 @@ function get_or_default(array $array, $key, $default = NULL) {
 class Controller {
 	private $get,
 	        $post,
-	        $server,
+	        
+	        //$server,
+	        $remoteAddr,
+
 	        $Model,
 	        $View,
 	        $maxNumComments,
 	        $Captcha,
-
-	        //$pageName,
-	        $pageId,
-
+	        $pageId, // set in constructor.
 	        $PageData;
 
 	function __construct(array $config = array()) {
-		$this->get = \comment_system\get_or_default($config, 'get', array());//$config['get'];
-		$this->post = \comment_system\get_or_default($config,'post', array());//$config['post'];
-		$this->server = \comment_system\get_or_default($config, 'server', array());//$config['server'];
+		$this->get = \comment_system\get_or_default($config, 'get', array());
+		$this->post = \comment_system\get_or_default($config,'post', array());
 		
+
+		//$this->server = \comment_system\get_or_default($config, 'server', array());
+		$this->remoteAddr = \comment_system\get_or_default($config, 'remoteAddr');
+
+
+
 		$Database = $config['database'];
 
 		if(isset($config['model'])) {
@@ -51,12 +56,7 @@ class Controller {
 			$this->PageData = $this->build_default_page_data($Database);
 		}
 
-
-
 		$this->pageId = $this->get_page_id(\comment_system\get_or_default($config, 'pageName'));
-		//$this->pageName = \comment_system\get_or_default($config, 'pageName');
-	
-
 	}
 
 	private function get_page_id($pageName) {
@@ -141,7 +141,7 @@ class Controller {
 	private function is_captcha_valid() {
 		return $this->Captcha->is_valid(
 			$this->Model->captcha_key(),
-			$this->server['REMOTE_ADDR'],
+			$this->remoteAddr,//$this->server['REMOTE_ADDR'],
 			\comment_system\get_or_default($this->post, "recaptcha_challenge_field"),
 			\comment_system\get_or_default($this->post, "recaptcha_response_field")
 		);

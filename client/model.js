@@ -217,8 +217,10 @@ var new_form_model = function (spec) {
                 url: submitCommentUrl,
                 data: formData,
                 dataType: spec.dataType || 'json',
+                dataType: "text",
                 beforeSend: spec.beforeSend,
                 success: function (json) {
+                    //alert(json);
                     if(json['status'] === false) {
                         that.publish({
                             error: {

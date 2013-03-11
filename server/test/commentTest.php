@@ -40,8 +40,9 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 			"database" => $this->DB,
 			"get" => $get,
 			"post" => $post,
-			"server" => $server,
-			//"model" => $this->create_model(),
+			
+			"remoteAddr" => $server['REMOTE_ADDR'],
+			
 			"view" => null,
 			"maxNumComments" => 3
 		);

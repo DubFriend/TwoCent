@@ -7,11 +7,14 @@ require 'recaptcha.php';
 
 $DB = new PDO("mysql:host=localhost;dbname=comment_test", 'root', 'P0l.ar-B3ar');
 
+
 $Controller = new \comment_system\Controller(array(
 	"database" => $DB,
 	"get" => $_GET,
 	"post" => $_POST,
-	"server" => $_SERVER,
+	
+	"remoteAddr" => $_SERVER['REMOTE_ADDR']
+	//"server" => $_SERVER,
 	//"pageName" => "pagename"
 ));
 
