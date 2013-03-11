@@ -11,7 +11,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 	        $date2 = "2013-02-15 16:34:59",
 	        $date3 = "2013-02-15 16:35:00",
 	        $pageAId, $pageBId,
-	        $bobCommentId, $aliceCommentId, $joeCommentId;
+	        $bobCommentId, $aliceCommentId, $joeCommentId, $maryCommentId;
 
 	function setUp() {
 		if($this->isSqlite) {
@@ -30,13 +30,18 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	private function create_controller($get = NULL, $post = NULL, $server = NULL, $captcha = NULL) {
+	private function create_controller(
+						$get = NULL,
+						$post = NULL,
+						$server = NULL,
+						$captcha = NULL,
+						$pageName = NULL) {
 		$config = array(
 			"database" => $this->DB,
 			"get" => $get,
 			"post" => $post,
 			"server" => $server,
-			"model" => $this->create_model(),
+			//"model" => $this->create_model(),
 			"view" => null,
 			"maxNumComments" => 3
 		);
@@ -44,7 +49,11 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		if($captcha) {
 			$config['captcha'] = $captcha;
 		}
+		if($pageName) {
+			$config['pageName'] = $pageName;
+		}
 		
+
 		return new \comment_system\Controller($config);
 	}
 
@@ -124,6 +133,12 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 			"date" => $this->date1
 		));
 
+		$this->maryCommentId = $this->insert('Comment', array(
+			"page" => $this->pageBId,
+			"name" => "mary",
+			"comment" => "mary comment",
+			"date" => $this->date1
+		));
 	}
 
 	private function get_expected_bob() {
@@ -157,6 +172,18 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 			"pageName" => "pageA",
 			"name" => "joe",
 			"comment" => "joe comment",
+			"date" => $this->date1
+		);
+	}
+
+	private function get_expected_mary() {
+		return array(
+			"id" => $this->maryCommentId,
+			"parent" => NULL,
+			"pageId" => $this->pageBId,
+			"pageName" => "pageB",
+			"name" => "mary",
+			"comment" => "mary comment",
 			"date" => $this->date1
 		);
 	}
@@ -240,13 +267,30 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
+
+
+
 	function test_get_next_first_query() {
-		$Ctl = $this->create_controller(array("page" => $this->pageAId));
+		//$Ctl = $this->create_controller(array("page" => $this->pageAId));
+		$Ctl = $this->create_controller(null, null, null, null, "pageA");
 		$this->assertEquals(
 			array(
 				$this->get_expected_joe(),
 				$this->get_expected_bob()
 			),
+			$Ctl->get_next()
+		);
+	}
+
+
+
+
+
+
+	function test_get_next_first_query_pageB() {
+		$Ctl = $this->create_controller(array("page" => $this->pageBId));
+		$this->assertEquals(
+			array($this->get_expected_mary()),
 			$Ctl->get_next()
 		);
 	}
@@ -293,7 +337,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 				"comment" => "mary response",
 				"date" => $this->date1
 			),
-			$this->select("Comment", 4)
+			$this->select("Comment", 5)
 		);
 
 		$this->assertFalse($this->select("Page", 3));

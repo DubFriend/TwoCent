@@ -11,27 +11,8 @@ $Controller = new \comment_system\Controller(array(
 	"database" => $DB,
 	"get" => $_GET,
 	"post" => $_POST,
-	"server" => $_SERVER/*,
-	"model" => new \comment_system\Model(
-		new \DataLayer(array(
-			"PDO" => $DB,
-			"primaryTable" => "Comment",
-			"primaryKey" => "id",
-			"tableLinks" => array(
-				"INNER page = Page.id"
-			),
-			"fieldMap" => array(
-				"id" => "Comment.id",
-				"parent" => "Comment.parent",
-				"pageId" => "Comment.page",
-				"pageName" => "Page.name",
-				"comment" => "Comment.comment",
-				"name" => "Comment.name",
-				"date" => "Comment.date"
-			)
-		))
-	),
-	"view" => new \comment_system\View()*/
+	"server" => $_SERVER,
+	"pageName" => "pagename"
 ));
 
 

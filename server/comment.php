@@ -16,13 +16,14 @@ class Controller {
 	        $maxNumComments,
 	        $Captcha,
 	      
+	        //$pageId,
 	        $pageName,
 	        $PageData;
 
 	function __construct(array $config = array()) {
-		$this->get = $config['get'];
-		$this->post = $config['post'];
-		$this->server = $config['server'];
+		$this->get = \comment_system\get_or_default($config, 'get', array());//$config['get'];
+		$this->post = \comment_system\get_or_default($config,'post', array());//$config['post'];
+		$this->server = \comment_system\get_or_default($config, 'server', array());//$config['server'];
 		
 		$Database = $config['database'];
 
@@ -39,16 +40,8 @@ class Controller {
 		else {
 			$this->View = $this->build_default_view();
 		}
-
-
-
-		//$this->Model = $config['model'];
-		//$this->View = $config['view'];
-		
 		$this->maxNumComments = \comment_system\get_or_default($config, 'maxNumComments', 50);
 		$this->Captcha = isset($config['captcha']) ? $config['captcha'] : new ReCaptcha();
-
-
 
 		if(isset($config['pageData'])) {
 			$this->PageData = $config['pageData'];
@@ -56,7 +49,33 @@ class Controller {
 		else {
 			$this->PageData = $this->build_default_page_data($Database);
 		}
+		
 		$this->pageName = \comment_system\get_or_default($config, 'pageName');
+	}
+
+	private function get_page_id($pageName) {
+		$pageId = null;
+		if($pageName) {
+			$pageId = $this->PageData->select("@name = ?", array($pageName), array("id"))->next()['id'];
+		}
+		else if($this->is_page_id_valid(\comment_system\get_or_default($this->post, 'pageId'))) {
+			$pageId = $this->post['pageId'];
+		}
+		else if($this->is_page_id_valid(\comment_system\get_or_default($this->get, 'page'))) {
+			$pageId = $this->get['page'];
+		}
+		return $pageId;
+	}
+
+	private function is_page_id_valid($pageId) {
+		$isValid = false;
+		$results = $this->PageData->select("@id = ?", array($pageId));
+		if($results) {
+			if($results->count() == 1) {
+				$isValid = true;
+			}
+		}
+		return $isValid;
 	}
 
 	private function build_default_model($Database) {
@@ -86,14 +105,21 @@ class Controller {
 	}
 
 	private function build_default_page_data($Database) {
-
+		return new \Datalayer(array(
+            "PDO" => $Database,
+            "primaryTable" => "Page",
+            "primaryKey" => "id",
+            "fieldMap" => array(
+                "id" => "Page.id",
+                "name" => "Page.name"
+            )
+        ));
 	}
 
 	function get_next($numComments = NULL) {
 		$numResults = $numComments ? $numComments : $this->maxNumComments;
 		$lastId = isset($this->get['last_id']) ? $this->get['last_id'] : NULL;
-
-		return $this->Model->get_next($lastId, $this->get['page'], $numResults);
+		return $this->Model->get_next($lastId, $this->get_page_id($this->pageName), $numResults);
 	}
 
 	function insert_comment() {
@@ -124,7 +150,6 @@ class Controller {
 
 class ReCaptcha {
 	function is_valid($key, $ip, $challenge, $response) {
-//echo "$key $ip $challenge $response";
 		$resp = recaptcha_check_answer (
 			$key,
 			$ip,
@@ -147,7 +172,9 @@ class NullCaptcha {
 class Model {
 	private $DB,
 	        $commentCount,
+	        //TODO doesnt appear to be used...
 	        $lastId,
+	        //TODO captcha_key might as well just handle this.
 	        $privateCaptchaKey = "6LcARN0SAAAAAEF6mlK_bzW7ESmgzs1Zsr6E5v7f";
 
 	function __construct($DB) {
