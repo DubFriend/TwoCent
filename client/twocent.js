@@ -10,11 +10,17 @@ $(document).ready(function () {
             maxLength: 2048
         }),
 
+        captchaValidator = new_text_validator({
+            minLength: 1,
+            maxLength: 64 //doubt any captcha's be that big.
+        }),
+
         form_validate = function (data) {
             var i, isValid = true,
                 status = {
                     "name": nameValidator.validate(data.name),
-                    "comment": commentValidator.validate(data.comment)
+                    "comment": commentValidator.validate(data.comment),
+                    "captcha": captchaValidator.validate(data.captcha)
                 };
 
             for(key in status) {

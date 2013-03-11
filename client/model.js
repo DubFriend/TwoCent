@@ -147,8 +147,16 @@ var new_form_model = function (spec) {
 
                 that.publish({error: error});
             };
-
+            //clear error
             that.publish({error: false});
+            if(status.captcha.status === false) {
+                that.publish({
+                    error: {
+                        message: "Captcha not set."
+                    }
+                });
+            }
+
 
             if(status.status === false) {
                 fine_grained_response(status.name, "name");
@@ -193,7 +201,8 @@ var new_form_model = function (spec) {
             formData = get_data(),
             status = validate({
                 name: formData['name'],
-                comment: formData.comment
+                comment: formData.comment,
+                captcha: formData.recaptcha_response_field
             });
 
         if(status['status'] === true) {
