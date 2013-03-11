@@ -32,6 +32,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 
 	private function create_controller($get = NULL, $post = NULL, $server = NULL, $captcha = NULL) {
 		$config = array(
+			"database" => $this->DB,
 			"get" => $get,
 			"post" => $post,
 			"server" => $server,

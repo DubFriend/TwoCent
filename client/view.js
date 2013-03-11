@@ -155,9 +155,7 @@ var new_comment_view = function (spec) {
 var new_form_view = function (spec) {
     var that = new_view(spec),
         id = that.id(),
-
         captcha = spec.captcha || Recaptcha,
-
         clear = function () {
             var $comment = $(id + ' [name = "comment"]');
             $(id + ' input[name = "name"]').val("");
@@ -285,7 +283,6 @@ var new_response_form_view = function (spec) {
         parent_update = that.update,
         template = spec.template,
         set = function (commentId) {
-
             $(that.id()).remove();
             $(template).insertAfter($('#tc_' + commentId + ' > .response_button'));
             that.create_captcha("response_recaptcha");
@@ -308,10 +305,7 @@ var new_response_form_view = function (spec) {
             set(data.set);
         }
         if(data.success) {
-            //remove resonse form after delay (to show success message)
-            //setTimeout(function () {
-                $(that.id()).remove();
-            //}, 5000);
+            $(that.id()).remove();
         }
     };
 

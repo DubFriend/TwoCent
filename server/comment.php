@@ -14,16 +14,79 @@ class Controller {
 	        $Model,
 	        $View,
 	        $maxNumComments,
-	        $Captcha;
+	        $Captcha,
+	      
+	        $pageName,
+	        $PageData;
 
 	function __construct(array $config = array()) {
 		$this->get = $config['get'];
 		$this->post = $config['post'];
 		$this->server = $config['server'];
-		$this->Model = $config['model'];
-		$this->View = $config['view'];
+		
+		$Database = $config['database'];
+
+		if(isset($config['model'])) {
+			$this->Model = $config['model'];
+		}
+		else {
+			$this->Model = $this->build_default_model($Database);
+		}
+		
+		if(isset($config['view'])) {
+			$this->View = $config['view'];
+		}
+		else {
+			$this->View = $this->build_default_view();
+		}
+
+
+
+		//$this->Model = $config['model'];
+		//$this->View = $config['view'];
+		
 		$this->maxNumComments = \comment_system\get_or_default($config, 'maxNumComments', 50);
 		$this->Captcha = isset($config['captcha']) ? $config['captcha'] : new ReCaptcha();
+
+
+
+		if(isset($config['pageData'])) {
+			$this->PageData = $config['pageData'];
+		}
+		else {
+			$this->PageData = $this->build_default_page_data($Database);
+		}
+		$this->pageName = \comment_system\get_or_default($config, 'pageName');
+	}
+
+	private function build_default_model($Database) {
+		return new \comment_system\Model(
+			new \DataLayer(array(
+				"PDO" => $Database,
+				"primaryTable" => "Comment",
+				"primaryKey" => "id",
+				"tableLinks" => array(
+					"INNER page = Page.id"
+				),
+				"fieldMap" => array(
+					"id" => "Comment.id",
+					"parent" => "Comment.parent",
+					"pageId" => "Comment.page",
+					"pageName" => "Page.name",
+					"comment" => "Comment.comment",
+					"name" => "Comment.name",
+					"date" => "Comment.date"
+				)
+			))
+		);
+	}
+
+	private function build_default_view() {
+		return new \comment_system\View();
+	}
+
+	private function build_default_page_data($Database) {
+
 	}
 
 	function get_next($numComments = NULL) {

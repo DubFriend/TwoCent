@@ -8,10 +8,11 @@ require 'recaptcha.php';
 $DB = new PDO("mysql:host=localhost;dbname=comment_test", 'root', 'P0l.ar-B3ar');
 
 $Controller = new \comment_system\Controller(array(
+	"database" => $DB,
 	"get" => $_GET,
 	"post" => $_POST,
-	"server" => $_SERVER,
-	"model" => new\comment_system\Model(
+	"server" => $_SERVER/*,
+	"model" => new \comment_system\Model(
 		new \DataLayer(array(
 			"PDO" => $DB,
 			"primaryTable" => "Comment",
@@ -30,7 +31,7 @@ $Controller = new \comment_system\Controller(array(
 			)
 		))
 	),
-	"view" => new \comment_system\View()
+	"view" => new \comment_system\View()*/
 ));
 
 
