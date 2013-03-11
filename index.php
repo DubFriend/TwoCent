@@ -12,7 +12,7 @@ $Controller = new \comment_system\Controller(array(
 	"get" => $_GET,
 	"post" => $_POST,
 	"server" => $_SERVER,
-	"pageName" => "pagename"
+	//"pageName" => "pagename"
 ));
 
 

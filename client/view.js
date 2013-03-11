@@ -283,9 +283,19 @@ var new_response_form_view = function (spec) {
         parent_update = that.update,
         template = spec.template,
         set = function (commentId) {
+            var $template = $(template);
+
             $(that.id()).remove();
-            $(template).insertAfter($('#tc_' + commentId + ' > .response_button'));
+            $template.hide();
+            $template.insertAfter($('#tc_' + commentId + ' > .response_button'));
+
             that.create_captcha("response_recaptcha");
+
+            $template.slideDown();
+
+            //$(that.id()).remove();
+            //$(template).insertAfter($('#tc_' + commentId + ' > .response_button'));
+            //that.create_captcha("response_recaptcha");
         };
 
     that.init = function () {
@@ -305,7 +315,10 @@ var new_response_form_view = function (spec) {
             set(data.set);
         }
         if(data.success) {
-            $(that.id()).remove();
+            //remove resonse form after delay (to show success message)
+            setTimeout(function () {
+                $(that.id()).remove();
+            }, 5000);
         }
     };
 

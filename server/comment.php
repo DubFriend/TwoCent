@@ -15,9 +15,10 @@ class Controller {
 	        $View,
 	        $maxNumComments,
 	        $Captcha,
-	      
-	        //$pageId,
-	        $pageName,
+
+	        //$pageName,
+	        $pageId,
+
 	        $PageData;
 
 	function __construct(array $config = array()) {
@@ -50,7 +51,12 @@ class Controller {
 			$this->PageData = $this->build_default_page_data($Database);
 		}
 
-		$this->pageName = \comment_system\get_or_default($config, 'pageName');
+
+
+		$this->pageId = $this->get_page_id(\comment_system\get_or_default($config, 'pageName'));
+		//$this->pageName = \comment_system\get_or_default($config, 'pageName');
+	
+
 	}
 
 	private function get_page_id($pageName) {
@@ -119,7 +125,7 @@ class Controller {
 	function get_next($numComments = NULL) {
 		$numResults = $numComments ? $numComments : $this->maxNumComments;
 		$lastId = isset($this->get['last_id']) ? $this->get['last_id'] : NULL;
-		return $this->Model->get_next($lastId, $this->get_page_id($this->pageName), $numResults);
+		return $this->Model->get_next($lastId, $this->pageId, $numResults);
 	}
 
 	function insert_comment() {
@@ -143,7 +149,7 @@ class Controller {
 
 	//sends out an initial templated prepopulated with the first entries.
 	function index() {
-		return $this->View->build_page($this->get_next(), 1);
+		return $this->View->build_page($this->get_next(), $this->pageId);
 	}
 }
 
@@ -171,11 +177,11 @@ class NullCaptcha {
 
 class Model {
 	private $DB,
-	        $commentCount,
+	        $commentCount;
 	        //TODO doesnt appear to be used...
-	        $lastId,
+	        //$lastId,
 	        //TODO captcha_key might as well just handle this.
-	        $privateCaptchaKey = "6LcARN0SAAAAAEF6mlK_bzW7ESmgzs1Zsr6E5v7f";
+	        //$privateCaptchaKey = "6LcARN0SAAAAAEF6mlK_bzW7ESmgzs1Zsr6E5v7f";
 
 	function __construct($DB) {
 		$this->DB = $DB;
@@ -183,7 +189,7 @@ class Model {
 
 
 	function captcha_key() {
-		return $this->privateCaptchaKey;
+		return "6LcARN0SAAAAAEF6mlK_bzW7ESmgzs1Zsr6E5v7f";
 	}
 
 

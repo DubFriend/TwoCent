@@ -267,9 +267,6 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
-
-
-
 	function test_get_next_first_query() {
 		$Ctl = $this->create_controller(null, null, null, null, "pageA");
 		$this->assertEquals(
