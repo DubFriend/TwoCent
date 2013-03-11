@@ -299,27 +299,30 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
-	function test_insert_comment() {
-
-		$Ctl = $this->create_controller(
+	private function create_controller_override(array $override = array()) {
+		$post = array(
+			"parent" => $this->joeCommentId,
+			"pageId" => $this->pageAId,
+			"name" => "mary",
+			"comment" => "mary response",
+			"date" => $this->date1,
+			"recaptcha_challenge_field" => NULL,
+			"recaptcha_response_field" => NULL
+		);
+		foreach($override as $key => $value) {
+			$post[$key] = $value;
+		}
+		return $this->create_controller(
 			NULL,
-			array(
-				"parent" => $this->joeCommentId,
-				"pageId" => $this->pageAId,
-				"name" => "mary",
-				"comment" => "mary response",
-				"date" => $this->date1,
-				"recaptcha_challenge_field" => NULL,
-				"recaptcha_response_field" => NULL
-			),
-			array(
-				"REMOTE_ADDR" => NULL
-			),
+			$post,
+			array("REMOTE_ADDR" => NULL),
 			new \comment_system\NullCaptcha()
 		);
+	}
 
+	function test_insert_comment() {
+		$Ctl = $this->create_controller_override();
 		$id = $Ctl->insert_comment()['primary'];
-
 		$this->assertEquals(
 			array(
 				"id" => $id,
@@ -331,8 +334,41 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 			),
 			$this->select("Comment", 5)
 		);
-
 		$this->assertFalse($this->select("Page", 3));
 	}
+
+	private function string_of_length($n) {
+		return str_pad("", $n, "x");
+	}
+
+	function test_insert_name_too_short() {
+		$Ctl = $this->create_controller_override(array("name" => $this->string_of_length(2)));
+		$Ctl->insert_comment();
+		$this->assertEquals(null, $this->select("Comment", 5));
+	}
+
+	function test_insert_name_too_long() {
+		$Ctl = $this->create_controller_override(array("name" => $this->string_of_length(33)));
+		$Ctl->insert_comment();
+		$this->assertEquals(null, $this->select("Comment", 5));
+	}
+
+	function test_insert_comment_too_short() {
+		$Ctl = $this->create_controller_override(array("comment" => $this->string_of_length(9)));
+		$Ctl->insert_comment();
+		$this->assertEquals(null, $this->select("Comment", 5));
+	}
+
+	function test_insert_comment_too_long() {
+		$Ctl = $this->create_controller_override(array("comment" => $this->string_of_length(2049)));
+		$Ctl->insert_comment();
+		$this->assertEquals(null, $this->select("Comment", 5));
+	}
+
+	function test_insert_
+
+
+
+
 }
 ?>

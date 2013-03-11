@@ -149,7 +149,7 @@ var new_form_model = function (spec) {
             };
             //clear error
             that.publish({error: false});
-            if(status.captcha.status === false) {
+            if(status.captcha && status.captcha.status === false) {
                 that.publish({
                     error: {
                         message: "Captcha not set."

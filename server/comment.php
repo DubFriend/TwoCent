@@ -246,15 +246,30 @@ class Model {
 
 	function insert_comment(array $post) {
 		$values = $this->DB->filter_array($post);
+		if($this->is_post_valid($values)) {
+			if(!isset($values['date'])) {
+				$values['date'] = date('Y-m-d H:i:s');
+			}
+			if(isset($values['id'])) {
+				unset($values['id']);
+			}
+			return $this->DB->insert($values);
+		}
+	}
 
-		if(!isset($values['date'])) {
-			$values['date'] = date('Y-m-d H:i:s');
+	private function is_post_valid(array $post) {
+		$isPostValid = false;
+		if(
+			$this->is_in_range(\comment_system\get_or_default($post, 'name'), 3, 32) &&
+			$this->is_in_range(\comment_system\get_or_default($post, 'comment'), 10, 2048)
+		) {
+			$isPostValid = true;
 		}
-		
-		if(isset($values['id'])) {
-			unset($values['id']);
-		}
-		return $this->DB->insert($values);
+		return $isPostValid;
+	}
+
+	private function is_in_range($string, $min, $max) {
+		return (strlen($string) >= $min && strlen($string) <= $max);
 	}
 }
 
