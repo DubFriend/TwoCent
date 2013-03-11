@@ -33,11 +33,18 @@ class Controller {
 
 		$Database = $config['database'];
 
+		if(isset($config['pageData'])) {
+			$this->PageData = $config['pageData'];
+		}
+		else {
+			$this->PageData = $this->build_default_page_data($Database);
+		}
+
 		if(isset($config['model'])) {
 			$this->Model = $config['model'];
 		}
 		else {
-			$this->Model = $this->build_default_model($Database);
+			$this->Model = $this->build_default_model($Database, $this->PageData);
 		}
 		
 		if(isset($config['view'])) {
@@ -49,12 +56,7 @@ class Controller {
 		$this->maxNumComments = \comment_system\get_or_default($config, 'maxNumComments', 50);
 		$this->Captcha = isset($config['captcha']) ? $config['captcha'] : new ReCaptcha();
 
-		if(isset($config['pageData'])) {
-			$this->PageData = $config['pageData'];
-		}
-		else {
-			$this->PageData = $this->build_default_page_data($Database);
-		}
+
 
 		$this->pageId = $this->get_page_id(\comment_system\get_or_default($config, 'pageName'));
 	}
@@ -84,7 +86,7 @@ class Controller {
 		return $isValid;
 	}
 
-	private function build_default_model($Database) {
+	private function build_default_model($Database, $PageData) {
 		return new \comment_system\Model(
 			new \DataLayer(array(
 				"PDO" => $Database,
@@ -102,7 +104,8 @@ class Controller {
 					"name" => "Comment.name",
 					"date" => "Comment.date"
 				)
-			))
+			)),
+			$PageData
 		);
 	}
 
@@ -177,14 +180,16 @@ class NullCaptcha {
 
 class Model {
 	private $DB,
+			$PageData,
 	        $commentCount;
 	        //TODO doesnt appear to be used...
 	        //$lastId,
 	        //TODO captcha_key might as well just handle this.
 	        //$privateCaptchaKey = "6LcARN0SAAAAAEF6mlK_bzW7ESmgzs1Zsr6E5v7f";
 
-	function __construct($DB) {
+	function __construct($DB, $PageData) {
 		$this->DB = $DB;
+		$this->PageData = $PageData;
 	}
 
 
@@ -260,12 +265,24 @@ class Model {
 	private function is_post_valid(array $post) {
 		$isPostValid = false;
 		if(
-			$this->is_in_range(\comment_system\get_or_default($post, 'name'), 3, 32) &&
-			$this->is_in_range(\comment_system\get_or_default($post, 'comment'), 10, 2048)
+			$this->is_in_range(\comment_system\get_or_default($post, 'name'), 3, 32)
+			&& $this->is_in_range(\comment_system\get_or_default($post, 'comment'), 10, 2048)
+			&& $this->is_valid_page_id(\comment_system\get_or_default($post, 'pageId'))
 		) {
 			$isPostValid = true;
 		}
 		return $isPostValid;
+	}
+
+	private function is_valid_page_id($id) {
+		$isValidPageId = false;
+		$results = $this->PageData->select("@id = ?", array($id));
+		if($results) {
+			if($results->count() == 1) {
+				$isValidPageId = true;
+			}
+		}
+		return $isValidPageId;
 	}
 
 	private function is_in_range($string, $min, $max) {

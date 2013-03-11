@@ -365,7 +365,11 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(null, $this->select("Comment", 5));
 	}
 
-	function test_insert_
+	function test_insert_invalid_page_id() {
+		$Ctl = $this->create_controller_override(array("pageId" => 123456));
+		$Ctl->insert_comment();
+		$this->assertEquals(null, $this->select("Comment", 5));
+	}
 
 
 
