@@ -271,7 +271,6 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 
 
 	function test_get_next_first_query() {
-		//$Ctl = $this->create_controller(array("page" => $this->pageAId));
 		$Ctl = $this->create_controller(null, null, null, null, "pageA");
 		$this->assertEquals(
 			array(
@@ -282,13 +281,8 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
-
-
-
-
-
 	function test_get_next_first_query_pageB() {
-		$Ctl = $this->create_controller(array("page" => $this->pageBId));
+		$Ctl = $this->create_controller(null, null, null, null, "pageB");
 		$this->assertEquals(
 			array($this->get_expected_mary()),
 			$Ctl->get_next()

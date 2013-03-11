@@ -63,8 +63,8 @@ div.comment_wrap {
     border-radius: 7px;
 }
 
-#recaptcha {
-    margin: 0.4em 0 0.4em 0;
+#main_recaptcha, #response_recaptcha {
+    height: 150px;
 }
 
 #twocent [type=submit] {

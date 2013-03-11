@@ -49,7 +49,7 @@ class Controller {
 		else {
 			$this->PageData = $this->build_default_page_data($Database);
 		}
-		
+
 		$this->pageName = \comment_system\get_or_default($config, 'pageName');
 	}
 
