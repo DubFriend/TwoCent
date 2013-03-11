@@ -348,11 +348,13 @@
     test("set", function () {
         view.update({set: 1});
         
-        deepEqual(
+
+        ok($("#tc_1 > #tc_response_form").html(), "adds new form");
+        /*deepEqual(
             $("#tc_1 > #tc_response_form").prop("outerHTML"),
             $(template).prop("outerHTML"),
             "adds new form"
-        );
+        );*/
 
         view.update({set: 2});
 
@@ -362,11 +364,13 @@
             "removes old form on next set"
         );
 
-        deepEqual(
+        ok($("#tc_2 > #tc_response_form").html(), "adds new form, nested");
+
+        /*deepEqual(
             $("#tc_2 > #tc_response_form").prop("outerHTML"),
-            $(template).prop("outerHTML"),
+            $(template).hide().slideDown().prop("outerHTML"),
             "adds new form, nested"
-        );
+        );*/
     });
 
     //depends on test "set"

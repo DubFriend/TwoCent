@@ -284,18 +284,11 @@ var new_response_form_view = function (spec) {
         template = spec.template,
         set = function (commentId) {
             var $template = $(template);
-
             $(that.id()).remove();
             $template.hide();
             $template.insertAfter($('#tc_' + commentId + ' > .response_button'));
-
             that.create_captcha("response_recaptcha");
-
             $template.slideDown();
-
-            //$(that.id()).remove();
-            //$(template).insertAfter($('#tc_' + commentId + ' > .response_button'));
-            //that.create_captcha("response_recaptcha");
         };
 
     that.init = function () {
