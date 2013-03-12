@@ -229,6 +229,11 @@ var new_form_view = function (spec) {
         captcha.create("6LcARN0SAAAAACoo8eA5xCX76zdfN6m7RVPzwgPG", divId, {theme: "clean"});
     };
 
+    that.destroy_captcha = function () {
+        captcha.destroy();
+        $('iframe[src="about:blank"]').remove();
+    };
+
     that.reload_captcha = function () {
         captcha.reload();
     };
@@ -284,6 +289,7 @@ var new_response_form_view = function (spec) {
         template = spec.template,
         set = function (commentId) {
             var $template = $(template);
+            that.destroy_captcha();
             $(that.id()).remove();
             $template.hide();
             $template.insertAfter($('#tc_' + commentId + ' > .response_button'));

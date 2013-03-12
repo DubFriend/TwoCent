@@ -338,7 +338,8 @@
                 view = new_response_form_view({
                     template: template,
                     captcha: {
-                        create: function () {}
+                        create: function () {},
+                        destroy: function () {}
                     }
                 });
             }

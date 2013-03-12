@@ -29,6 +29,7 @@ var new_controller = function (spec) {
             var $form = $(mainFormView.id()),
                 set_captcha = function () {
                     if(! $('#main_recaptcha').html()) {
+                        mainFormView.destroy_captcha();
                         mainFormView.create_captcha("main_recaptcha");
                         responseFormView.remove();
                     }
