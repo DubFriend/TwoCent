@@ -57,3 +57,9 @@ var new_controller = function (spec) {
 
     return that;
 };
+
+
+var new_admin_controller = function (spec) {
+    var that = new_controller(spec),
+        
+};

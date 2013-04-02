@@ -2,31 +2,37 @@
 namespace comment_system;
 //requires datalayer.
 
+
+// a few utility functions here
+
 function get_or_default(array $array, $key, $default = NULL) {
 	return isset($array[$key]) ? $array[$key] : $default;
 }
 
+function format_error(\Exception $e) {
+	return "
+	<p>Exception : <strong>" . get_class($e) . " : </strong>" . $e->getMessage() . "</p>
+	<p><strong>File : </strong>" . $e->getFile() . " <strong>Line : </strong>" . $e->getLine() . "</p>
+	<p><strong>Trace : </strong>" . $e->getTraceAsString() . "</p>";
+}
+
+
+class Bad_Url_Exception extends \Exception {}
 
 class Controller {
-	private $get,
-	        $post,
-	        
-	        //$server,
-	        $remoteAddr,
-
-	        $Model,
-	        $View,
-	        $maxNumComments,
-	        $Captcha,
-	        $pageId, // set in constructor.
-	        $PageData;
+    protected $get,
+              $post,
+              $remoteAddr,
+              $Model,
+              $View,
+              $maxNumComments,
+              $Captcha,
+              $pageId, // set in constructor.
+              $PageData;
 
 	function __construct(array $config = array()) {
 		$this->get = \comment_system\get_or_default($config, 'get', array());
 		$this->post = \comment_system\get_or_default($config,'post', array());
-		
-
-		//$this->server = \comment_system\get_or_default($config, 'server', array());
 		$this->remoteAddr = \comment_system\get_or_default($config, 'remoteAddr');
 
 		$Database = $config['database'];
@@ -54,21 +60,26 @@ class Controller {
 		$this->maxNumComments = \comment_system\get_or_default($config, 'maxNumComments', 50);
 		$this->Captcha = isset($config['captcha']) ? $config['captcha'] : new ReCaptcha();
 
-
-
 		$this->pageId = $this->get_page_id(\comment_system\get_or_default($config, 'pageName'));
 	}
 
 	private function get_page_id($pageName) {
 		$pageId = null;
 		if($pageName) {
-			$pageId = $this->PageData->select("@name = ?", array($pageName), array("id"))->next()['id'];
+			$results = $this->PageData->select("@name = ?", array($pageName), array("id"));
+			if($results) {
+				$pageId = $results->next()['id'];
+			}
 		}
 		else if($this->is_page_id_valid(\comment_system\get_or_default($this->post, 'pageId'))) {
 			$pageId = $this->post['pageId'];
 		}
 		else if($this->is_page_id_valid(\comment_system\get_or_default($this->get, 'page'))) {
 			$pageId = $this->get['page'];
+		}
+		
+		if(!$pageId) {
+			throw new Bad_Url_Exception("could not resolve page id");
 		}
 		return $pageId;
 	}
@@ -84,34 +95,38 @@ class Controller {
 		return $isValid;
 	}
 
-	private function build_default_model($Database, $PageData) {
+	protected function build_default_model($Database, $PageData) {
 		return new \comment_system\Model(
-			new \DataLayer(array(
-				"PDO" => $Database,
-				"primaryTable" => "Comment",
-				"primaryKey" => "id",
-				"tableLinks" => array(
-					"INNER page = Page.id"
-				),
-				"fieldMap" => array(
-					"id" => "Comment.id",
-					"parent" => "Comment.parent",
-					"pageId" => "Comment.page",
-					"pageName" => "Page.name",
-					"comment" => "Comment.comment",
-					"name" => "Comment.name",
-					"date" => "Comment.date"
-				)
-			)),
+            $this->build_default_comment_data($Database),
 			$PageData
 		);
 	}
 
-	private function build_default_view() {
+	protected function build_default_view() {
 		return new \comment_system\View();
 	}
 
-	private function build_default_page_data($Database) {
+    protected function build_default_comment_data($Database) {
+        return new \DataLayer(array(
+            "PDO" => $Database,
+            "primaryTable" => "Comment",
+            "primaryKey" => "id",
+            "tableLinks" => array(
+                "INNER page = Page.id"
+            ),
+            "fieldMap" => array(
+                "id" => "Comment.id",
+                "parent" => "Comment.parent",
+                "pageId" => "Comment.page",
+                "pageName" => "Page.name",
+                "comment" => "Comment.comment",
+                "name" => "Comment.name",
+                "date" => "Comment.date"
+            )
+        ));
+    }
+
+	protected function build_default_page_data($Database) {
 		return new \Datalayer(array(
             "PDO" => $Database,
             "primaryTable" => "Page",
@@ -142,7 +157,7 @@ class Controller {
 	private function is_captcha_valid() {
 		return $this->Captcha->is_valid(
 			$this->Model->captcha_key(),
-			$this->remoteAddr,//$this->server['REMOTE_ADDR'],
+			$this->remoteAddr,
 			\comment_system\get_or_default($this->post, "recaptcha_challenge_field"),
 			\comment_system\get_or_default($this->post, "recaptcha_response_field")
 		);
@@ -174,27 +189,19 @@ class NullCaptcha {
 }
 
 
-
-
 class Model {
 	private $DB,
 			$PageData,
 	        $commentCount;
-	        //TODO doesnt appear to be used...
-	        //$lastId,
-	        //TODO captcha_key might as well just handle this.
-	        //$privateCaptchaKey = "6LcARN0SAAAAAEF6mlK_bzW7ESmgzs1Zsr6E5v7f";
 
 	function __construct($DB, $PageData) {
 		$this->DB = $DB;
 		$this->PageData = $PageData;
 	}
 
-
 	function captcha_key() {
 		return "6LcARN0SAAAAAEF6mlK_bzW7ESmgzs1Zsr6E5v7f";
 	}
-
 
 	function get_next($startId, $page, $numComments) {
 		$this->commentCount = 0;
@@ -337,18 +344,23 @@ class View {
 				<link rel='stylesheet' href='client/style.css'>
 			</head>
 			<body>
-				" . $this->build_comment_system($comments, $pageId) . "
-				<script src='../jquery/jquery.js'></script>
-				<script src='http://www.google.com/recaptcha/api/js/recaptcha_ajax.js'></script>
-				<script src='client/spin.js'></script>
-				<script src='client/lib.js'></script>
-				<script src='client/validator.js'></script>
-				<script src='client/model.js'></script>
-				<script src='client/view.js'></script>
-				<script src='client/controller.js'></script>
-				<script src='client/twocent.js'></script>
+				" . $this->build_comment_system($comments, $pageId) . 
+				    $this->build_js() . "
 			</body>
 		</html>";
+	}
+
+	protected function build_js() {
+		return "
+		<script src='../jquery/jquery.js'></script>
+		<script src='http://www.google.com/recaptcha/api/js/recaptcha_ajax.js'></script>
+		<script src='client/spin.js'></script>
+		<script src='client/lib.js'></script>
+		<script src='client/validator.js'></script>
+		<script src='client/model.js'></script>
+		<script src='client/view.js'></script>
+		<script src='client/controller.js'></script>
+		<script src='client/twocent.js'></script>";
 	}
 
 	private function build_response_form() {
@@ -387,7 +399,7 @@ class View {
 	}
 
 	//recursively builds comment and its responses.
-	private function build_comment(array $passedComment = NULL) {
+	protected function build_comment(array $passedComment = NULL) {
 		$id = $name = $comment = $date = $children = NULL;
 
 		if($passedComment) {

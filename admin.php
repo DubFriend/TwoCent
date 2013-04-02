@@ -4,12 +4,13 @@ error_reporting(E_ALL);
 
 require '../utilities/datalayer0.2/datalayer/datalayer.php';
 require 'server/comment.php';
-require 'recaptcha.php';
+//require 'recaptcha.php';
+require 'server/admin.php';
 
 $DB = new PDO("mysql:host=localhost;dbname=comment_test", 'root', 'P0l.ar-B3ar');
 
 try{
-	$Controller = new \comment_system\Controller(array(
+	$Controller = new \comment_system\Controller_Admin(array(
 		"database" => $DB,
 		"get" => $_GET,
 		"post" => $_POST,

@@ -286,6 +286,22 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 			$Ctl->get_next()
 		);
 	}
+	
+	/**
+     * @expectedException \comment_system\Bad_Url_Exception
+     * @expectedExceptionMessage could not resolve page id
+     */
+	function test_get_next_first_query_invalid_page() {
+		$Ctl = $this->create_controller(null, null, null, null, "wrongPage");
+	}
+
+	/**
+     * @expectedException \comment_system\Bad_Url_Exception
+     * @expectedExceptionMessage could not resolve page id
+     */
+	function test_get_next_first_query_null_page() {
+		$Ctl = $this->create_controller(null, null, null, null, null);
+	}
 
 	function test_get_next() {
 		$Ctl = $this->create_controller(array(
@@ -319,6 +335,15 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 			new \comment_system\NullCaptcha()
 		);
 	}
+
+	/**
+     * @expectedException \comment_system\Bad_Url_Exception
+     * @expectedExceptionMessage could not resolve page id
+     */
+	function test_invalid_page_id() {
+		$Ctl = $this->create_controller_override(array("pageId" => 4654));
+	}
+
 
 	function test_insert_comment() {
 		$Ctl = $this->create_controller_override();
@@ -365,12 +390,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(null, $this->select("Comment", 5));
 	}
 
-	function test_insert_invalid_page_id() {
-		$Ctl = $this->create_controller_override(array("pageId" => 4654));
-		$Ctl->insert_comment();
-		$this->assertEquals(null, $this->select("Comment", 5));
-	}
-
+	
 
 	function test_insert_invalid_date_too_short() {
 		$Ctl = $this->create_controller_override(array("date" => "2013-03-11 01:42:5"));
