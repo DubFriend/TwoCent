@@ -55,7 +55,7 @@ $(document).ready(function () {
     responseFormModel.subscribe(commentView);
     commentModel.subscribe(commentView);
 
-    controller = new_controller({
+    controller = new_admin_controller({
         commentModel: commentModel,
         mainFormModel: mainFormModel,
         mainFormView: mainFormView,

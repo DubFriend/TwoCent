@@ -88,29 +88,8 @@ var new_comment_view = function (spec) {
         template,
         isAllreadyInit = false,
         
-        build_comments = function (comments) {
-            var i, com,
-                $comment,
-                allComments = [];
-
-            for(i = 0; i < comments.length; i += 1) {
-                com = comments[i];
-                $comment = $(template);
-                $comment.attr('id', 'tc_' + com['id']);
-                $comment.find('.name').html(com['name']);
-                $comment.find('.comment').html(com.comment);
-                $comment.find('.date').html(com.date);
-                if(com['children']) {
-                    $comment.append(build_comments(com['children']));
-                }
-                allComments.push($comment.prop("outerHTML"));
-            }
-
-            return allComments.join("");
-        },
-
         add_comment = function(commentData, parentId) {
-            var $comment = $(build_comments([commentData]));
+            var $comment = $(that.build_comments([commentData]));
             if(parentId) {
                 $(that.id() + ' #tc_' + parentId).append($comment);
             }
@@ -118,6 +97,27 @@ var new_comment_view = function (spec) {
                 $(that.id()).prepend($comment);
             }
         };
+
+    that.build_comments = function (comments) {
+        var i, com,
+            $comment,
+            allComments = [];
+
+        for(i = 0; i < comments.length; i += 1) {
+            com = comments[i];
+            $comment = $(template);
+            $comment.attr('id', 'tc_' + com['id']);
+            $comment.find('.name').html(com['name']);
+            $comment.find('.comment').html(com.comment);
+            $comment.find('.date').html(com.date);
+            if(com['children']) {
+                $comment.append(this.build_comments(com['children']));
+            }
+            allComments.push($comment.prop("outerHTML"));
+        }
+
+        return allComments.join("");
+    };
 
     that.init = function () {
         if(isAllreadyInit) {
@@ -136,7 +136,7 @@ var new_comment_view = function (spec) {
         }
 
         if(data.comments) {
-            $(this.id()).append($(build_comments(data.comments)));
+            $(this.id()).append($(this.build_comments(data.comments)));
         }
         
         if(data.isWaiting === true) {
@@ -146,6 +146,19 @@ var new_comment_view = function (spec) {
             this.clear_waiting('#tc_loading_comments');
         }
     };
+
+    return that;
+};
+
+
+var new_admin_comment_view = function (spec) {
+    spec = spec || {};
+    spec['id'] = spec['id'] || "#tc_comments";
+
+    var that = new_comment_view(spec);
+
+
+
 
     return that;
 };

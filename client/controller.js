@@ -60,6 +60,21 @@ var new_controller = function (spec) {
 
 
 var new_admin_controller = function (spec) {
-    var that = new_controller(spec),
-        
+    var that = {},
+        commentModel = spec.commentModel,
+
+        bind_edit = function () {
+
+        },
+
+        bind_delete = function () {
+
+        };
+
+    that.init = function () {
+        bind_edit();
+        bind_delete();
+    }
+
+    return that;
 };
