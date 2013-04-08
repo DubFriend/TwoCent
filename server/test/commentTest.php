@@ -1,6 +1,14 @@
 <?php
 require_once 'comment.php';
+require_once 'admin.php';
 require_once '../../utilities/datalayer0.2/datalayer/datalayer.php';
+
+
+
+function try_array(array $array, $index, $default = null) {
+	return isset($array[$index]) ? $array[$index] : $default;
+}
+
 
 
 class CommentTest extends PHPUnit_Framework_TestCase {
@@ -58,27 +66,22 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		return new \comment_system\Controller($config);
 	}
 
-	private function create_model() {
-		return new \comment_system\Model(
-			new \DataLayer(array(
-				"PDO" => $this->DB,
-				"primaryTable" => "Comment",
-				"primaryKey" => "id",
-				"tableLinks" => array(
-					"INNER page = Page.id"
-				),
-				"fieldMap" => array(
-					"id" => "Comment.id",
-					"parent" => "Comment.parent",
-					"pageId" => "Comment.page",
-					"pageName" => "Page.name",
-					"comment" => "Comment.comment",
-					"name" => "Comment.name",
-					"date" => "Comment.date"
-				)
-			))
-		);
+
+
+
+	private function create_admin_controller($get = null, $post = null, $DB = null) {
+		$DB = $DB ? $DB : $this->DB;
+		return new \comment_system\Controller_Admin(array(
+			"database" => $DB,
+			"get" => $get,
+			"post" => $post,
+			"view" => null,
+			"pageName" => "pageA"
+		));
 	}
+
+
+
 
 	//create in memory sqlite database for fast unit testing.
 	private function create_database() {
@@ -209,6 +212,34 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 
 
 //-------------------------------------- BEGIN TESTS ---------------------------------------------
+
+
+	function test_edit_success() {
+		$Ctl = $this->create_admin_controller(array("id" => $this->joeCommentId), array(
+			"name" => "nameEdit",
+			"comment" => "commentEdit"
+		));
+		$Ctl->edit_comment();
+
+		$Joe = $this->get_expected_joe();
+		$Joe['name'] = "nameEdit";
+		$Joe['comment'] = "commentEdit";
+		$Joe['page'] = 1;
+		unset($Joe['pageId']);
+		unset($Joe['pageName']);
+		$this->assertEquals($Joe, $this->select('Comment', $this->joeCommentId));
+	}
+
+
+	function test_delete_success() {
+		$Ctl = $this->create_admin_controller(array("id" => $this->bobCommentId));
+		$Ctl->delete_comment();
+
+		$this->assertFalse($this->select('Comment', $this->bobCommentId));
+		$this->assertFalse($this->select('Comment', $this->aliceCommentId));
+	}
+
+
 
 
 

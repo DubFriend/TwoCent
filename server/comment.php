@@ -190,7 +190,7 @@ class NullCaptcha {
 
 
 class Model {
-	private $DB,
+	protected $DB,
 			$PageData,
 	        $commentCount;
 
