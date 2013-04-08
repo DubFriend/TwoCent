@@ -39,3 +39,7 @@ function get_window_height() {
     }
     return myHeight;
 };
+
+var trim_id = function (id) {
+    return id.slice(3);
+};

@@ -85,7 +85,7 @@ var new_comment_view = function (spec) {
     spec['id'] = spec['id'] || "#tc_comments";
     
     var that = new_view(spec),
-        template,
+        //template,
         isAllreadyInit = false,
         
         add_comment = function(commentData, parentId) {
@@ -105,7 +105,7 @@ var new_comment_view = function (spec) {
 
         for(i = 0; i < comments.length; i += 1) {
             com = comments[i];
-            $comment = $(template);
+            $comment = $(this.template);
             $comment.attr('id', 'tc_' + com['id']);
             $comment.find('.name').html(com['name']);
             $comment.find('.comment').html(com.comment);
@@ -124,7 +124,7 @@ var new_comment_view = function (spec) {
             throw "cannot init comment view more than once.";
         }
         else {
-            template = spec.template || $('#tc_comment_template').html();
+            this.template = spec.template || $('#tc_comment_template').html();
             $('#tc_comment_template').remove();
             isAllreadyInit = true;
         }
@@ -157,11 +157,36 @@ var new_admin_comment_view = function (spec) {
 
     var that = new_comment_view(spec);
 
+    that.build_comments = function (comments) {
+        var i, com,
+            $comment,
+            allComments = [];
 
+        for(i = 0; i < comments.length; i += 1) {
+            com = comments[i];
+            $comment = $(this.template);
+            $comment.attr('id', 'tc_' + com['id']);
+            //$comment.find('.name').html(com['name']);
+            //$comment.find('.name').attr('value', com['name']);
 
+            $comment.find('.name').attr('value',com['name']);
+
+            $comment.find('.comment').html(com.comment);
+            $comment.find('.date').html(com.date);
+            if(com['children']) {
+                $comment.append(this.build_comments(com['children']));
+            }
+            allComments.push($comment.prop("outerHTML"));
+        }
+
+        return allComments.join("");
+    };
 
     return that;
 };
+
+
+
 
 
 

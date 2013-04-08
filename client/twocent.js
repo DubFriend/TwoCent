@@ -55,7 +55,7 @@ $(document).ready(function () {
     responseFormModel.subscribe(commentView);
     commentModel.subscribe(commentView);
 
-    controller = new_controller({
+    controller = new_comment_controller({
         commentModel: commentModel,
         mainFormModel: mainFormModel,
         mainFormView: mainFormView,
@@ -63,5 +63,4 @@ $(document).ready(function () {
         responseFormView: responseFormView,
     });
     controller.init();
-
 });

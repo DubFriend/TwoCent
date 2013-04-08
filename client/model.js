@@ -72,6 +72,50 @@ var new_model = function (spec) {
 
 
 
+
+
+
+
+
+
+var new_admin_model = function (spec) {
+    spec = spec || {};
+    var that = new_model(spec),
+        get_data = function (id) {
+            var $div = $('#' + id);
+            return {
+                name: $div.find('.name').val(),
+                comment: $div.find('.comment').val(),
+            };
+        };
+
+    that.edit_comment = function (id) {
+        this._ajax({
+            type: "POST",
+            url: spec.editCommentUrl,
+            data: get_data(id)
+        });
+    };
+
+    that.delete_comment = function (id) {
+        this._ajax({
+            url: spec.deleteCommentUrl + "&id=" + trim_id(id)
+        });
+    };
+
+    return that;
+};
+
+
+
+
+
+
+
+
+
+
+
 //should only be one instance of comment_model
 var new_comment_model = function (spec) {
     spec = spec || {};
@@ -188,7 +232,7 @@ var new_form_model = function (spec) {
 
         get_parent_id = function () {
             if(formId === "#tc_response_form") {
-                return $(formId).parent().attr("id").slice(3);
+                return trim_id($(formId).parent().attr("id"));
             }
         };
 

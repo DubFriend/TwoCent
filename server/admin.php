@@ -38,13 +38,11 @@ class View_Admin extends View {
 
 		$html = "" .
 		"<div class='comment_wrap' id='tc_$id'>" .
-			"<form class='edit_comment_form'>" .
-				"<input type='text' class='name' value='$name'/>" .
-				"<textarea class='comment'>$comment</textarea>" .
-				"<button class='edit_button'>edit</button>" .
-				"<button class='delete_button'>delete</button>" .
-			"</form>" .
-			"<div class='date'>$date</div>";
+			"<input type='text' class='name' value='$name'/>" .
+			"<textarea class='comment'>$comment</textarea>" .
+			"<div class='date'>$date</div>" .
+			"<button class='edit_button'>edit</button>" .
+			"<button class='delete_button'>delete</button>";
 
 		if($children) {
 			foreach($children as $child) {

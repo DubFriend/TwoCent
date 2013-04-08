@@ -322,3 +322,78 @@
 
 
 }());
+
+
+(function () {
+    var model,
+        sendConfig,
+        publishData = [],
+        subscriber = {
+            update: function (data) {
+                publishData.push(data);
+            }
+        },
+        nullEvent = {
+            preventDefault: function () {}
+        };
+
+    module(
+        "admin model",
+        {
+            setup: function () {
+                $('#qunit-fixture').append(
+                    "<div class='comment_wrap' id='tc_1'>" +
+                        "<input type='text' class='name' value='test name'/>" +
+                        "<textarea class='comment'>test comment</textarea>" +
+                        "<div class='date'>test date</div>" +
+                        "<button class='edit_button'>edit</button>" +
+                        "<button class='delete_button'>delete</button>" +
+                    "</div>"
+                );
+                
+                sendConfig = undefined;
+                
+                model = new_admin_model({
+                    ajax: {
+                        send_request: function (config) {
+                            sendConfig = config;
+                        }
+                    },
+                    editCommentUrl: "editUrl",
+                    deleteCommentUrl: "deleteUrl"
+                });
+                model.init();
+                model.subscribe(subscriber);
+            }
+        }
+    );
+
+
+    test("edit_comment", function () {
+        model.edit_comment("tc_1");
+
+        deepEqual(
+            sendConfig,
+            {
+                type: "POST",
+                url: "editUrl",
+                data: {
+                    "name": "test name",
+                    "comment": "test comment"
+                }
+            }
+        );
+    });
+
+    test("delete_comment", function () {
+        model.delete_comment("tc_1");
+
+        deepEqual(
+            sendConfig,
+            {
+                url: "deleteUrl&id=1"
+            }
+        );
+    });
+
+}());
