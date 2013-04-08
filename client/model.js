@@ -85,21 +85,23 @@ var new_admin_model = function (spec) {
             var $div = $('#' + id);
             return {
                 name: $div.find('.name').val(),
-                comment: $div.find('.comment').val(),
+                comment: $div.find('.comment').val()
             };
         };
 
     that.edit_comment = function (id) {
         this._ajax({
+            dataType: "text",
             type: "POST",
-            url: spec.editCommentUrl,
+            url: spec.editCommentUrl + "&page=" + this.page_id(),
             data: get_data(id)
         });
     };
 
     that.delete_comment = function (id) {
         this._ajax({
-            url: spec.deleteCommentUrl + "&id=" + trim_id(id)
+            dataType: "text",
+            url: spec.deleteCommentUrl + "&page=" + this.page_id() + "&id=" + trim_id(id)
         });
     };
 

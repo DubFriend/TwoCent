@@ -4,8 +4,8 @@ $(document).ready(function () {
         commentView = new_admin_comment_view(),
 
         adminModel = new_admin_model({
-            editCommentUrl: "index.php?act=edit",
-            deleteCommentUrl: "index.php?act=delete"
+            editCommentUrl: "admin.php?act=edit_comment",
+            deleteCommentUrl: "admin.php?act=delete_comment"
         }),
 
         controller;

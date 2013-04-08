@@ -130,7 +130,6 @@ var new_comment_controller = function (spec) {
         };
 
     that.init = function () {
-
         bind_more_comments();
         bind_form(mainFormModel);
         bind_response_buttons();

@@ -38,9 +38,11 @@ switch($action) {
 			echo json_encode(array("id" => $response['primary']));
 		}
 		break;
+
 	case "next_comments":
 		echo json_encode($Controller->get_next());
 		break;
+
 	default:
 		echo $Controller->index();
 		break;

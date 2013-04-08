@@ -30,18 +30,29 @@ if(isset($_GET['act'])) {
 }
 
 switch($action) {
-	case "new_comment":
-		$response =  $Controller->insert_comment();
-		if(isset($response['status']) && $response['status'] === FALSE) {
-			echo json_encode($response);
-		}
-		else {
-			echo json_encode(array("id" => $response['primary']));
-		}
-		break;
+	
 	case "next_comments":
 		echo json_encode($Controller->get_next());
 		break;
+
+
+	//admin
+	case "edit_comment":
+		$Controller->edit_comment();
+		/*echo json_encode(array(
+			"GET" => $_GET,
+			"POST" => $_POST
+		));*/
+		break;
+
+	case "delete_comment":
+		$Controller->delete_comment();
+		/*echo json_encode(array(
+			"GET" => $_GET,
+			"POST" => $_POST
+		));*/
+		break;
+
 	default:
 		echo $Controller->index();
 		break;
