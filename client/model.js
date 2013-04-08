@@ -91,16 +91,16 @@ var new_admin_model = function (spec) {
 
     that.edit_comment = function (id) {
         this._ajax({
-            dataType: "text",
+            //dataType: "text",
             type: "POST",
-            url: spec.editCommentUrl + "&page=" + this.page_id(),
+            url: spec.editCommentUrl + "&page=" + this.page_id() + "&id=" + trim_id(id),
             data: get_data(id)
         });
     };
 
     that.delete_comment = function (id) {
         this._ajax({
-            dataType: "text",
+            //dataType: "text",
             url: spec.deleteCommentUrl + "&page=" + this.page_id() + "&id=" + trim_id(id)
         });
     };

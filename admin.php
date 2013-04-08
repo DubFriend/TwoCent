@@ -39,18 +39,18 @@ switch($action) {
 	//admin
 	case "edit_comment":
 		$Controller->edit_comment();
-		/*echo json_encode(array(
+		echo json_encode(array(
 			"GET" => $_GET,
 			"POST" => $_POST
-		));*/
+		));
 		break;
 
 	case "delete_comment":
 		$Controller->delete_comment();
-		/*echo json_encode(array(
+		echo json_encode(array(
 			"GET" => $_GET,
 			"POST" => $_POST
-		));*/
+		));
 		break;
 
 	default:

@@ -376,7 +376,7 @@
             sendConfig,
             {
                 type: "POST",
-                url: "editUrl",
+                url: "editUrl&page=undefined&id=1",
                 data: {
                     "name": "test name",
                     "comment": "test comment"
