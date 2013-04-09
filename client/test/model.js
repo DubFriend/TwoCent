@@ -342,6 +342,7 @@
         {
             setup: function () {
                 $('#qunit-fixture').append(
+                    '<div id="tc_page_id">1</div>' +
                     "<div class='comment_wrap' id='tc_1'>" +
                         "<input type='text' class='name' value='test name'/>" +
                         "<textarea class='comment'>test comment</textarea>" +
@@ -376,7 +377,7 @@
             sendConfig,
             {
                 type: "POST",
-                url: "editUrl&page=undefined&id=1",
+                url: "editUrl&page=1&id=1",
                 data: {
                     "name": "test name",
                     "comment": "test comment"
@@ -391,7 +392,7 @@
         deepEqual(
             sendConfig,
             {
-                url: "deleteUrl&id=1"
+                url: "deleteUrl&page=1&id=1"
             }
         );
     });

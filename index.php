@@ -13,7 +13,6 @@ try{
 		"database" => $DB,
 		"get" => $_GET,
 		"post" => $_POST,
-		//"pageName" => "pageB",
 		"remoteAddr" => $_SERVER['REMOTE_ADDR']
 	));
 }
