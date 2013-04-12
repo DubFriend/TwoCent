@@ -336,7 +336,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 
 	function test_get_next() {
 		$Ctl = $this->create_controller(array(
-			"page" => $this->pageAId,
+			"pageId" => $this->pageAId,
 			"last_id" => $this->joeCommentId
 		));
 

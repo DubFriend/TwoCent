@@ -74,8 +74,8 @@ class Controller {
 		else if($this->is_page_id_valid(\comment_system\get_or_default($this->post, 'pageId'))) {
 			$pageId = $this->post['pageId'];
 		}
-		else if($this->is_page_id_valid(\comment_system\get_or_default($this->get, 'page'))) {
-			$pageId = $this->get['page'];
+		else if($this->is_page_id_valid(\comment_system\get_or_default($this->get, 'pageId'))) {
+			$pageId = $this->get['pageId'];
 		}
 		
 		if(!$pageId) {

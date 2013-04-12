@@ -93,7 +93,7 @@ var new_admin_model = function (spec) {
         this._ajax({
             //dataType: "text",
             type: "POST",
-            url: spec.editCommentUrl + "&page=" + this.page_id() + "&id=" + trim_id(id),
+            url: spec.editCommentUrl + "&pageId=" + this.page_id() + "&id=" + trim_id(id),
             data: get_data(id)
         });
     };
@@ -101,7 +101,7 @@ var new_admin_model = function (spec) {
     that.delete_comment = function (id) {
         this._ajax({
             //dataType: "text",
-            url: spec.deleteCommentUrl + "&page=" + this.page_id() + "&id=" + trim_id(id)
+            url: spec.deleteCommentUrl + "&pageId=" + this.page_id() + "&id=" + trim_id(id)
         });
     };
 
@@ -123,19 +123,24 @@ var new_comment_model = function (spec) {
     spec = spec || {};
 
     var that = new_model(spec),
-        lastCommentId = $("#tc_comments > .comment_wrap").last().attr("id"),
+        //lastCommentId = $("#tc_comments > .comment_wrap").last().attr("id"),
         nextCommentsUrl = spec.nextCommentsUrl || "index.php?act=next_comments",
         nextCommentsFlag = true,
         
         build_url = function (pageId, lastCommentId) {
-            var url = nextCommentsUrl + "&page=" + pageId;
+            var url = nextCommentsUrl + "&pageId=" + pageId;
             if(lastCommentId) {
                 url += "&last_id=" + lastCommentId;
             }
             return url;
+        },
+
+        get_last_comment_id = function () {
+            var id = $("#tc_comments > .comment_wrap").last().attr("id");
+            return id ? id.slice(3) : undefined;
         };
 
-    lastCommentId = lastCommentId ? lastCommentId.slice(3) : undefined;
+        //lastCommentId = lastCommentId ? lastCommentId.slice(3) : undefined;
         
     that.get_next_comments = function (on_success_extra) {
         var on_success_extra = on_success_extra || function () {};
@@ -147,16 +152,17 @@ var new_comment_model = function (spec) {
             this._ajax({
                 url: build_url(
                     this.page_id(),
-                    lastCommentId
+                    get_last_comment_id()
+                    //lastCommentId
                 ),
                 success: function (json) {
                     that.publish({
                         isWaiting: false,
                         comments: json
                     });
-                    if(json[json.length -1]) {
-                        lastCommentId = json[json.length - 1]["id"];
-                    }
+                    //if(json[json.length -1]) {
+                    //    lastCommentId = json[json.length - 1]["id"];
+                    //}
                     nextCommentsFlag = true;
                     on_success_extra();
                 }
