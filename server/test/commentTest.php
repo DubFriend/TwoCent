@@ -149,7 +149,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 		return array(
 			"id" => $this->bobCommentId,
 			"parent" => NULL,
-			"pageName" => "pageA",
+			//"pageName" => "pageA",
 			"pageId" => $this->pageAId,
 			"name" => "bob",
 			"comment" => "bob comment",
@@ -158,7 +158,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 				array(
 					"id" => $this->aliceCommentId,
 					"parent" => $this->bobCommentId,
-					"pageName" => "pageA",
+					//"pageName" => "pageA",
 					"pageId" => $this->pageAId,
 					"name" => "alice",
 					"comment" => "alice response",
@@ -173,7 +173,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 			"id" => $this->joeCommentId,
 			"parent" => NULL,
 			"pageId" => $this->pageAId,
-			"pageName" => "pageA",
+			//"pageName" => "pageA",
 			"name" => "joe",
 			"comment" => "joe comment",
 			"date" => $this->date1
@@ -185,7 +185,7 @@ class CommentTest extends PHPUnit_Framework_TestCase {
 			"id" => $this->maryCommentId,
 			"parent" => NULL,
 			"pageId" => $this->pageBId,
-			"pageName" => "pageB",
+			//"pageName" => "pageB",
 			"name" => "mary",
 			"comment" => "mary comment",
 			"date" => $this->date1

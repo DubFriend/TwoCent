@@ -14,7 +14,7 @@ try{
 		"database" => $DB,
 		"get" => $_GET,
 		"post" => $_POST,
-		//"pageName" => "pageB",
+		"pageName" => isset($_GET['pageName']) ? $_GET['pageName'] : null,
 		"remoteAddr" => $_SERVER['REMOTE_ADDR']
 	));
 }

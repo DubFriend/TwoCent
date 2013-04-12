@@ -111,16 +111,16 @@ class View_Admin  {
 	}
 
 	protected function build_js() {
-		return "
-		<script src='../jquery/jquery.js'></script>
-		<script src='http://www.google.com/recaptcha/api/js/recaptcha_ajax.js'></script>
-		<script src='client/spin.js'></script>
-		<script src='client/lib.js'></script>
-		<script src='client/validator.js'></script>
-		<script src='client/model.js'></script>
-		<script src='client/view.js'></script>
-		<script src='client/controller.js'></script>
-		<script src='client/admin.js'></script>";
+		return "" .
+		"<script src='../jquery/jquery.js'></script>" .
+		"<script src='http://www.google.com/recaptcha/api/js/recaptcha_ajax.js'></script>" .
+		"<script src='client/spin.js'></script>" .
+		"<script src='client/lib.js'></script>" .
+		"<script src='client/validator.js'></script>" .
+		"<script src='client/model.js'></script>" .
+		"<script src='client/view.js'></script>" .
+		"<script src='client/controller.js'></script>" .
+		"<script src='client/admin.js'></script>";
 	}
 }
 ?>

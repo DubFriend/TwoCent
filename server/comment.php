@@ -111,14 +111,14 @@ class Controller {
             "PDO" => $Database,
             "primaryTable" => "Comment",
             "primaryKey" => "id",
-            "tableLinks" => array(
+            /*"tableLinks" => array(
                 "INNER page = Page.id"
-            ),
+            ),*/
             "fieldMap" => array(
                 "id" => "Comment.id",
                 "parent" => "Comment.parent",
                 "pageId" => "Comment.page",
-                "pageName" => "Page.name",
+                //"pageName" => "Page.name",
                 "comment" => "Comment.comment",
                 "name" => "Comment.name",
                 "date" => "Comment.date"

@@ -62,7 +62,7 @@ var new_comment_controller = function (spec) {
         },
         
         bind_more_comments = function () {
-            alert("bind_more_comments");
+            //alert("bind_more_comments");
             super_bind_more_comments(bind_response_buttons);
         };
 
